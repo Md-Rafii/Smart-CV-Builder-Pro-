@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart CV Maker — Admin Dashboard</title>
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy, limit, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDApg7ZYyMaz6btWjgRwT-nSrENmqfGTEU",
+    authDomain: "cv-maker-3916f.firebaseapp.com",
+    projectId: "cv-maker-3916f",
+    storageBucket: "cv-maker-3916f.firebasestorage.app",
+    messagingSenderId: "780985578146",
+    appId: "1:780985578146:web:838662d4c40b4948d25dfb",
+    measurementId: "G-EFK4NHRS2S"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  window._fb = { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy, limit, serverTimestamp, deleteDoc };
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --green: #006A4E;
+  --red: #F42A41;
+  --gold: #FFB800;
+  --blue: #1565c0;
+  --purple: #6A1B9A;
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #283548;
+  --border: #334155;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --green-d: #059669;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* NAVBAR */
+.navbar { background: linear-gradient(90deg, #004d38, var(--green)); padding: 0 1.5rem; height: 58px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(0,0,0,0.4); }
+.navbar .logo { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 700; color: white; }
+.nav-user { display: flex; align-items: center; gap: 10px; }
+.admin-badge { background: var(--gold); color: #000; padding: 3px 10px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; }
+.btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 7px; font-family: inherit; font-size: 0.8rem; cursor: pointer; }
+
+/* LAYOUT */
+.layout { display: flex; min-height: calc(100vh - 58px); }
+.sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 1.2rem 0.8rem; flex-shrink: 0; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 0.87rem; color: var(--text-muted); transition: all 0.15s; border: none; background: transparent; text-align: left; width: 100%; font-family: inherit; margin-bottom: 3px; }
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: rgba(0,106,78,0.25); color: #4ade80; font-weight: 600; }
+.nav-item .icon { font-size: 1rem; width: 22px; }
+.sidebar-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; padding: 0 12px; margin: 1rem 0 0.5rem; }
+
+/* MAIN */
+.main { flex: 1; padding: 1.5rem; overflow-y: auto; }
+.page { display: none; }
+.page.active { display: block; }
+.page-title { font-family: 'Noto Serif Bengali', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.stat-card .val { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+.stat-card .lbl { font-size: 0.78rem; color: var(--text-muted); margin-top: 5px; }
+.stat-card.green { border-left: 3px solid var(--green-d); }
+.stat-card.gold { border-left: 3px solid var(--gold); }
+.stat-card.red { border-left: 3px solid var(--red); }
+.stat-card.blue { border-left: 3px solid var(--blue); }
+
+/* TABLE */
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.2rem; }
+.table-card .card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-weight: 700; font-size: 0.95rem; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 10px 14px; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--surface2); }
+td { padding: 11px 14px; font-size: 0.83rem; border-top: 1px solid var(--border); vertical-align: top; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.status-badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+.status-badge.pending { background: rgba(255,184,0,0.15); color: var(--gold); }
+.status-badge.approved { background: rgba(74,222,128,0.15); color: #4ade80; }
+.status-badge.rejected { background: rgba(244,42,65,0.15); color: var(--red); }
+.status-badge.used { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+
+/* BUTTONS */
+.btn { padding: 7px 16px; border-radius: 8px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-approve { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.btn-approve:hover { background: #059669; color: white; }
+.btn-reject { background: rgba(244,42,65,0.1); color: var(--red); border: 1px solid rgba(244,42,65,0.3); }
+.btn-reject:hover { background: var(--red); color: white; }
+.btn-save { background: var(--green); color: white; }
+.btn-save:hover { background: #005040; }
+.btn-danger { background: rgba(244,42,65,0.15); color: var(--red); border: 1px solid rgba(244,42,65,0.3); }
+.btn-primary { background: var(--blue); color: white; }
+.btn-add-vp { background: rgba(0,106,78,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+
+/* FORM */
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.2rem; }
+.form-title { font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: var(--text); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
+.form-group input, .form-group select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 11px; border-radius: 8px; font-family: inherit; font-size: 0.85rem; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--green); }
+.form-actions { margin-top: 14px; display: flex; gap: 10px; }
+
+/* PKG EDITOR */
+.pkg-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: center; background: var(--surface2); padding: 10px; border-radius: 8px; margin-bottom: 7px; }
+.pkg-row input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; border-radius: 7px; font-family: inherit; font-size: 0.83rem; width: 100%; }
+.btn-rm-pkg { background: none; border: none; color: var(--red); cursor: pointer; font-size: 1.1rem; padding: 0 5px; }
+
+/* LOGIN */
+.login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 360px; width: 100%; }
+.login-card h2 { font-family: 'Noto Serif Bengali', serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
+.login-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 12px 24px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; }
+.btn-google:hover { border-color: var(--green); background: rgba(0,106,78,0.15); }
+.btn-google img { width: 18px; }
+.access-denied { text-align: center; padding: 2rem; color: var(--red); }
+.access-denied h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 10px; font-size: 0.83rem; z-index: 999; animation: fadeIO 3.5s ease forwards; }
+.toast.success { border-left: 3px solid #4ade80; }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--gold); }
+@keyframes fadeIO { 0%{opacity:0;transform:translateY(16px)} 12%{opacity:1;transform:none} 80%{opacity:1} 100%{opacity:0} }
+
+/* LOADING */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; }
+.overlay.hidden { display: none; }
+.spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; display: flex; align-items: center; justify-content: center; }
+.modal-overlay.hidden { display: none; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.8rem; max-width: 420px; width: 100%; }
+.modal h3 { font-weight: 700; margin-bottom: 1rem; }
+.modal-btns { display: flex; gap: 10px; margin-top: 1.2rem; }
+
+/* SEARCH */
+.search-bar { display: flex; gap: 10px; margin-bottom: 1rem; }
+.search-bar input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 14px; border-radius: 9px; font-family: inherit; font-size: 0.85rem; }
+.search-bar input:focus { outline: none; border-color: var(--green); }
+.filter-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 9px; font-family: inherit; font-size: 0.83rem; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; padding: 0.7rem; display: flex; gap: 5px; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .sidebar-title { display: none; }
+  .nav-item { white-space: nowrap; flex-direction: column; font-size: 0.7rem; padding: 8px 10px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid.cols3 { grid-template-columns: 1fr; }
+  .pkg-row { grid-template-columns: 1fr 1fr; }
+  table { font-size: 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="overlay hidden" id="loading"><div class="spinner"></div></div>
+
+<!-- ADD VERIFIED PAYMENT MODAL -->
+<div class="modal-overlay hidden" id="vp-modal">
+  <div class="modal">
+    <h3>✅ Verified Payment যোগ করুন</h3>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem">এই Transaction ID দিয়ে user রিচার্জ করলে auto-approve হবে।</p>
+    <div class="form-grid">
+      <div class="form-group"><label>Transaction ID</label><input id="vp-trxid" placeholder="bKash/Nagad TrxID"></div>
+      <div class="form-group"><label>পরিমাণ (TK)</label><input id="vp-amount" type="number" placeholder="50"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-save" onclick="addVerifiedPayment()">যোগ করুন</button>
+      <button class="btn btn-danger" onclick="closeModal('vp-modal')">বাতিল</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIVE COINS MODAL -->
+<div class="modal-overlay hidden" id="coins-modal">
+  <div class="modal">
+    <h3>🪙 ম্যানুয়ালি কয়েন দিন</h3>
+    <div class="form-group" style="margin-bottom:12px"><label>User Email</label><input id="gc-email" placeholder="user@example.com"></div>
+    <div class="form-group" style="margin-bottom:12px"><label>কয়েনের পরিমাণ</label><input id="gc-coins" type="number" placeholder="50"></div>
+    <div class="modal-btns">
+      <button class="btn btn-save" onclick="giveCoins()">কয়েন দিন</button>
+      <button class="btn btn-danger" onclick="closeModal('coins-modal')">বাতিল</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="admin-app" style="display:none">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">⚙️ Smart CV Maker — Admin</div>
+    <div class="nav-user">
+      <span class="admin-badge">👑 ADMIN</span>
+      <span id="admin-email" style="font-size:0.8rem;color:rgba(255,255,255,0.7)"></span>
+      <button class="btn-logout" onclick="doLogout()">বের হন</button>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span> ড্যাশবোর্ড</button>
+      <button class="nav-item" onclick="showPage('payments',this)"><span class="icon">💳</span> পেমেন্ট রিকোয়েস্ট</button>
+      <button class="nav-item" onclick="showPage('users',this)"><span class="icon">👥</span> ইউজার ম্যানেজমেন্ট</button>
+      <button class="nav-item" onclick="showPage('verified',this)"><span class="icon">✅</span> Verified Payments</button>
+      <div class="sidebar-title">কনফিগারেশন</div>
+      <button class="nav-item" onclick="showPage('settings',this)"><span class="icon">⚙️</span> সেটিংস</button>
+      <button class="nav-item" onclick="showPage('packages',this)"><span class="icon">📦</span> প্যাকেজ ম্যানেজমেন্ট</button>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">📊 ড্যাশবোর্ড</div>
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card green"><div class="val" id="stat-users">—</div><div class="lbl">মোট ইউজার</div></div>
+          <div class="stat-card gold"><div class="val" id="stat-pending">—</div><div class="lbl">পেন্ডিং পেমেন্ট</div></div>
+          <div class="stat-card blue"><div class="val" id="stat-coins">—</div><div class="lbl">মোট কয়েন বিতরণ</div></div>
+          <div class="stat-card red"><div class="val" id="stat-revenue">—</div><div class="lbl">আনুমানিক রাজস্ব (TK)</div></div>
+        </div>
+        <div class="table-card">
+          <div class="card-header"><span class="card-title">🕐 সাম্প্রতিক পেমেন্ট রিকোয়েস্ট</span>
+            <button class="btn btn-approve" onclick="showPage('payments',null)">সব দেখুন →</button>
+          </div>
+          <table>
+            <thead><tr><th>ইউজার</th><th>পরিমাণ</th><th>কয়েন</th><th>Trx ID</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+            <tbody id="recent-payments-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAYMENTS -->
+      <div class="page" id="page-payments">
+        <div class="page-title">💳 পেমেন্ট রিকোয়েস্ট</div>
+        <div class="search-bar">
+          <input id="pay-search" placeholder="ইউজার নাম বা Trx ID দিয়ে খুঁজুন..." oninput="filterPayments()">
+          <select class="filter-select" id="pay-filter" onchange="filterPayments()">
+            <option value="">সব</option>
+            <option value="pending">পেন্ডিং</option>
+            <option value="approved">অনুমোদিত</option>
+            <option value="rejected">বাতিল</option>
+          </select>
+        </div>
+        <div class="table-card">
+          <div class="card-header">
+            <span class="card-title">সব পেমেন্ট রিকোয়েস্ট</span>
+            <button class="btn btn-add-vp" onclick="openModal('coins-modal')">🪙 ম্যানুয়াল কয়েন</button>
+          </div>
+          <table>
+            <thead><tr><th>ইউজার</th><th>ইমেইল</th><th>পরিমাণ</th><th>কয়েন</th><th>Trx ID</th><th>সময়</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+            <tbody id="payments-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="page" id="page-users">
+        <div class="page-title">👥 ইউজার ম্যানেজমেন্ট</div>
+        <div class="search-bar">
+          <input id="user-search" placeholder="নাম বা ইমেইল দিয়ে খুঁজুন..." oninput="filterUsers()">
+        </div>
+        <div class="table-card">
+          <div class="card-header"><span class="card-title">রেজিস্টার্ড ইউজার</span>
+            <button class="btn btn-add-vp" onclick="openModal('coins-modal')">🪙 কয়েন দিন</button>
+          </div>
+          <table>
+            <thead><tr><th>নাম</th><th>ইমেইল</th><th>কয়েন</th><th>যোগদান</th><th>অ্যাকশন</th></tr></thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VERIFIED PAYMENTS -->
+      <div class="page" id="page-verified">
+        <div class="page-title">✅ Verified Payments</div>
+        <div class="form-card">
+          <div class="form-title">নতুন Verified Payment যোগ করুন</div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">এই TrxID + Amount দিলে user রিচার্জ করার সময় auto-approve হবে।</p>
+          <div class="form-grid">
+            <div class="form-group"><label>Transaction ID</label><input id="new-vp-trx" placeholder="TrxID"></div>
+            <div class="form-group"><label>পরিমাণ (TK)</label><input id="new-vp-amt" type="number" placeholder="50"></div>
+          </div>
+          <div class="form-actions"><button class="btn btn-save" onclick="addVPDirect()">✅ যোগ করুন</button></div>
+        </div>
+        <div class="table-card">
+          <div class="card-header"><span class="card-title">Verified Payment লিস্ট</span>
+            <button class="btn btn-primary" onclick="loadVerifiedPayments()">🔄 রিফ্রেশ</button>
+          </div>
+          <table>
+            <thead><tr><th>Trx ID</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>যোগ করা</th><th>ব্যবহার</th></tr></thead>
+            <tbody id="vp-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="page-title">⚙️ সেটিংস</div>
+
+        <div class="form-card">
+          <div class="form-title">💰 ডাউনলোড মূল্য</div>
+          <div class="form-grid">
+            <div class="form-group"><label>প্রতি ডাউনলোড খরচ (কয়েন)</label><input id="s-dl-cost" type="number" value="50"></div>
+          </div>
+          <div class="form-actions"><button class="btn btn-save" onclick="saveDownloadCost()">সেভ করুন</button></div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-title">💳 পেমেন্ট নম্বর</div>
+          <div class="form-grid">
+            <div class="form-group"><label>bKash নম্বর</label><input id="s-bkash" placeholder="01999842041"></div>
+            <div class="form-group"><label>Nagad নম্বর</label><input id="s-nagad" placeholder="01972975646"></div>
+          </div>
+          <div class="form-group" style="margin-top:12px"><label>পেমেন্ট টাইপ</label>
+            <select id="s-paytype">
+              <option value="sendmoney">সেন্ড মানি (Send Money)</option>
+              <option value="payment">পেমেন্ট (Payment)</option>
+            </select>
+          </div>
+          <div class="form-actions"><button class="btn btn-save" onclick="savePaymentSettings()">সেভ করুন</button></div>
+        </div>
+      </div>
+
+      <!-- PACKAGES -->
+      <div class="page" id="page-packages">
+        <div class="page-title">📦 কয়েন প্যাকেজ ম্যানেজমেন্ট</div>
+        <div class="form-card">
+          <div class="form-title">প্যাকেজ এডিট করুন</div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:14px">কয়েন, দাম ও লেবেল পরিবর্তন করুন। পরিবর্তন সাথে সাথে ইউজারদের কাছে দেখাবে।</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:8px;padding:8px 10px;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase">
+            <span>কয়েন</span><span>মূল্য (TK)</span><span>লেবেল (ঐচ্ছিক)</span><span></span>
+          </div>
+          <div id="pkg-editor"></div>
+          <button class="btn btn-add-vp" onclick="addPkgRow()" style="margin-top:10px;width:100%">+ নতুন প্যাকেজ যোগ</button>
+          <div class="form-actions"><button class="btn btn-save" onclick="savePackages()">সব সেভ করুন</button></div>
+        </div>
+        <div class="form-card">
+          <div class="form-title" style="color:#4ade80">বর্তমান প্যাকেজ প্রিভিউ</div>
+          <div id="pkg-preview" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:12px"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-wrap" class="login-wrap">
+  <div class="login-card">
+    <div style="font-size:3rem;margin-bottom:1rem">⚙️</div>
+    <h2>Admin Login</h2>
+    <p>শুধুমাত্র অনুমোদিত admin এর জন্য। Google দিয়ে লগইন করুন।</p>
+    <button class="btn-google" onclick="doLogin()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
+      Google দিয়ে লগইন
+    </button>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:1rem">⚠️ শুধুমাত্র admin ইমেইল দিয়ে প্রবেশ করা যাবে।</p>
+  </div>
+</div>
+
+<!-- ACCESS DENIED -->
+<div id="access-denied" class="access-denied" style="display:none">
+  <h2>🚫 অ্যাক্সেস নেই</h2>
+  <p>এই ইমেইল admin নয়। সঠিক admin ইমেইল দিয়ে লগইন করুন।</p>
+  <button class="btn btn-danger" onclick="doLogout()" style="margin-top:1rem">লগআউট</button>
+</div>
+
+<script>
+const ADMIN_EMAIL = 'mdraffi530@gmail.com';
+
+let allPayments = [];
+let allUsers = [];
+let packages = [
+  {coins:50, price:50, label:''},
+  {coins:100, price:99, label:''},
+  {coins:150, price:149, label:'সাশ্রয়ী'},
+  {coins:200, price:199, label:''},
+  {coins:1000, price:950, label:'🔥 সেরা ডিল'}
+];
+
+function waitFirebase(cb) {
+  if(window._fb) cb();
+  else setTimeout(()=>waitFirebase(cb),100);
+}
+
+waitFirebase(()=>{
+  const {auth, onAuthStateChanged} = window._fb;
+  onAuthStateChanged(auth, user => {
+    if(user) {
+      if(user.email === ADMIN_EMAIL) {
+        document.getElementById('login-wrap').style.display='none';
+        document.getElementById('access-denied').style.display='none';
+        document.getElementById('admin-app').style.display='block';
+        document.getElementById('admin-email').textContent = user.email;
+        initAdmin();
+      } else {
+        document.getElementById('login-wrap').style.display='none';
+        document.getElementById('admin-app').style.display='none';
+        document.getElementById('access-denied').style.display='block';
+      }
+    } else {
+      document.getElementById('login-wrap').style.display='flex';
+      document.getElementById('admin-app').style.display='none';
+      document.getElementById('access-denied').style.display='none';
+    }
+  });
+});
+
+async function doLogin() {
+  const {auth, provider, signInWithPopup} = window._fb;
+  try { await signInWithPopup(auth, provider); }
+  catch(e) { showToast('লগইন ব্যর্থ: '+e.message,'error'); }
+}
+async function doLogout() {
+  const {auth, signOut} = window._fb;
+  await signOut(auth);
+}
+
+async function initAdmin() {
+  showLoading(true);
+  await loadSettings();
+  await loadDashboard();
+  await loadPayments();
+  await loadUsers();
+  await loadVerifiedPayments();
+  showLoading(false);
+}
+
+// ========== LOAD DATA ==========
+async function loadSettings() {
+  const {db, doc, getDoc} = window._fb;
+  try {
+    const snap = await getDoc(doc(db,'settings','main'));
+    if(snap.exists()) {
+      const s = snap.data();
+      if(s.downloadCost) document.getElementById('s-dl-cost').value = s.downloadCost;
+      if(s.bkash) document.getElementById('s-bkash').value = s.bkash;
+      if(s.nagad) document.getElementById('s-nagad').value = s.nagad;
+      if(s.paymentType) document.getElementById('s-paytype').value = s.paymentType;
+      if(s.packages) { packages = s.packages; }
+    } else {
+      // Init default settings
+      document.getElementById('s-bkash').value = '01999842041';
+      document.getElementById('s-nagad').value = '01972975646';
+    }
+  } catch(e) {}
+  renderPackageEditor();
+}
+
+async function loadDashboard() {
+  const {db, collection, getDocs, query, where} = window._fb;
+  try {
+    // Users count
+    const uSnap = await getDocs(collection(db,'users'));
+    document.getElementById('stat-users').textContent = uSnap.size;
+
+    // Pending payments
+    const pSnap = await getDocs(query(collection(db,'pending_payments'), where('status','==','pending')));
+    document.getElementById('stat-pending').textContent = pSnap.size;
+
+    // Recent payments
+    const aSnap = await getDocs(collection(db,'pending_payments'));
+    let totalCoins = 0, totalRev = 0;
+    const recents = [];
+    aSnap.forEach(d=>{
+      const dat = d.data();
+      if(dat.status==='approved') { totalCoins+=dat.coins||0; totalRev+=dat.amount||0; }
+      recents.push({id:d.id,...dat});
+    });
+    document.getElementById('stat-coins').textContent = totalCoins;
+    document.getElementById('stat-revenue').textContent = totalRev + ' ৳';
+
+    // Recent 5
+    const sorted = recents.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).slice(0,5);
+    document.getElementById('recent-payments-body').innerHTML = sorted.map(p=>payRow(p,true)).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px">কোনো পেমেন্ট নেই</td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+async function loadPayments() {
+  const {db, collection, getDocs} = window._fb;
+  try {
+    const snap = await getDocs(collection(db,'pending_payments'));
+    allPayments = [];
+    snap.forEach(d=>allPayments.push({id:d.id,...d.data()}));
+    allPayments.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    renderPayments(allPayments);
+  } catch(e) {}
+}
+
+async function loadUsers() {
+  const {db, collection, getDocs} = window._fb;
+  try {
+    const snap = await getDocs(collection(db,'users'));
+    allUsers = [];
+    snap.forEach(d=>allUsers.push({id:d.id,...d.data()}));
+    renderUsers(allUsers);
+  } catch(e) {}
+}
+
+async function loadVerifiedPayments() {
+  const {db, collection, getDocs} = window._fb;
+  try {
+    const snap = await getDocs(collection(db,'verified_payments'));
+    const rows = [];
+    snap.forEach(d=>rows.push({id:d.id,...d.data()}));
+    document.getElementById('vp-body').innerHTML = rows.map(r=>`
+      <tr>
+        <td><code style="font-size:0.78rem;color:var(--gold)">${r.trxId}</code></td>
+        <td>${r.amount} ৳</td>
+        <td><span class="status-badge ${r.status==='used'?'used':'approved'}">${r.status==='used'?'ব্যবহৃত':'অপেক্ষমাণ'}</span></td>
+        <td style="font-size:0.74rem;color:var(--text-muted)">${r.createdAt?new Date(r.createdAt.seconds*1000).toLocaleDateString('bn-BD'):'-'}</td>
+        <td style="font-size:0.74rem;color:var(--text-muted)">${r.usedBy||'-'}</td>
+      </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">কোনো verified payment নেই</td></tr>';
+  } catch(e) {}
+}
+
+// ========== RENDER ==========
+function payRow(p, short=false) {
+  const date = p.createdAt ? new Date(p.createdAt.seconds*1000).toLocaleDateString('bn-BD') : '-';
+  const statusBadge = `<span class="status-badge ${p.status}">${p.status==='pending'?'পেন্ডিং':p.status==='approved'?'অনুমোদিত':'বাতিল'}</span>`;
+  const actions = p.status==='pending' ? `<div style="display:flex;gap:6px">
+    <button class="btn btn-approve" onclick="approvePayment('${p.id}','${p.userId}',${p.coins},${p.amount})" title="অনুমোদন">✅</button>
+    <button class="btn btn-reject" onclick="rejectPayment('${p.id}')" title="বাতিল">❌</button>
+  </div>` : `<span style="font-size:0.75rem;color:var(--text-muted)">—</span>`;
+  if(short) return `<tr>
+    <td>${p.userName||p.userEmail||'-'}</td>
+    <td>${p.amount} ৳</td>
+    <td>${p.coins} 🪙</td>
+    <td><code style="font-size:0.72rem">${(p.trxId||'').slice(0,12)}...</code></td>
+    <td>${statusBadge}</td>
+    <td>${actions}</td>
+  </tr>`;
+  return `<tr>
+    <td>${p.userName||'-'}</td>
+    <td style="font-size:0.75rem">${p.userEmail||'-'}</td>
+    <td>${p.amount} ৳</td>
+    <td>${p.coins} 🪙</td>
+    <td><code style="font-size:0.74rem;color:var(--gold)">${p.trxId||'-'}</code></td>
+    <td style="font-size:0.74rem;color:var(--text-muted)">${date}</td>
+    <td>${statusBadge}</td>
+    <td>${actions}</td>
+  </tr>`;
+}
+
+function renderPayments(list) {
+  document.getElementById('payments-body').innerHTML = list.map(p=>payRow(p)).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px">কোনো পেমেন্ট নেই</td></tr>';
+}
+
+function renderUsers(list) {
+  document.getElementById('users-body').innerHTML = list.map(u=>`
+    <tr>
+      <td>${u.name||'-'}</td>
+      <td style="font-size:0.78rem">${u.email||'-'}</td>
+      <td><strong style="color:var(--gold)">${u.coins||0} 🪙</strong></td>
+      <td style="font-size:0.73rem;color:var(--text-muted)">${u.createdAt?new Date(u.createdAt).toLocaleDateString('bn-BD'):'-'}</td>
+      <td>
+        <button class="btn btn-add-vp" onclick="quickAddCoins('${u.id}','${u.email}',${u.coins||0})" style="font-size:0.73rem">🪙 কয়েন</button>
+        <button class="btn btn-danger" onclick="deductCoins('${u.id}',${u.coins||0})" style="font-size:0.73rem;margin-left:5px">− কাটুন</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">কোনো ইউজার নেই</td></tr>';
+}
+
+// ========== ACTIONS ==========
+async function approvePayment(payId, userId, coins, amount) {
+  if(!confirm(`এই পেমেন্ট অনুমোদন করবেন? ${coins} কয়েন যোগ হবে।`)) return;
+  showLoading(true);
+  const {db, doc, updateDoc, getDoc} = window._fb;
+  try {
+    const uSnap = await getDoc(doc(db,'users',userId));
+    if(!uSnap.exists()) { showToast('ইউজার খুঁজে পাওয়া যায়নি','error'); showLoading(false); return; }
+    const curCoins = uSnap.data().coins||0;
+    await updateDoc(doc(db,'users',userId),{coins: curCoins+coins});
+    await updateDoc(doc(db,'pending_payments',payId),{status:'approved', approvedAt: new Date().toISOString()});
+    showToast(`✅ অনুমোদিত! ${coins} কয়েন যোগ হয়েছে।`,'success');
+    await loadPayments(); await loadDashboard();
+  } catch(e) { showToast('ত্রুটি: '+e.message,'error'); }
+  showLoading(false);
+}
+
+async function rejectPayment(payId) {
+  if(!confirm('এই পেমেন্ট বাতিল করবেন?')) return;
+  showLoading(true);
+  const {db, doc, updateDoc} = window._fb;
+  try {
+    await updateDoc(doc(db,'pending_payments',payId),{status:'rejected', rejectedAt: new Date().toISOString()});
+    showToast('❌ পেমেন্ট বাতিল করা হয়েছে।','info');
+    await loadPayments(); await loadDashboard();
+  } catch(e) { showToast('ত্রুটি: '+e.message,'error'); }
+  showLoading(false);
+}
+
+async function giveCoins() {
+  const email = document.getElementById('gc-email').value.trim();
+  const coins = parseInt(document.getElementById('gc-coins').value);
+  if(!email||!coins) { showToast('সব তথ্য দিন','error'); return; }
+  showLoading(true);
+  const {db, collection, getDocs, query, where, doc, updateDoc} = window._fb;
+  try {
+    const q = query(collection(db,'users'), where('email','==',email));
+    const snap = await getDocs(q);
+    if(snap.empty) { showToast('ইউজার পাওয়া যায়নি','error'); showLoading(false); return; }
+    for(const d of snap.docs) {
+      const cur = d.data().coins||0;
+      await updateDoc(doc(db,'users',d.id),{coins: cur+coins});
+    }
+    closeModal('coins-modal');
+    showToast(`✅ ${coins} কয়েন দেওয়া হয়েছে।`,'success');
+    await loadUsers(); await loadDashboard();
+  } catch(e) { showToast('ত্রুটি: '+e.message,'error'); }
+  showLoading(false);
+}
+
+async function quickAddCoins(uid, email, curCoins) {
+  const c = prompt(`${email} কে কত কয়েন দিতে চান? (বর্তমান: ${curCoins})`);
+  if(!c||isNaN(c)) return;
+  showLoading(true);
+  const {db, doc, updateDoc} = window._fb;
+  try {
+    await updateDoc(doc(db,'users',uid),{coins: curCoins+parseInt(c)});
+    showToast(`✅ ${c} কয়েন যোগ হয়েছে।`,'success');
+    await loadUsers();
+  } catch(e) { showToast('ত্রুটি','error'); }
+  showLoading(false);
+}
+
+async function deductCoins(uid, curCoins) {
+  const c = prompt(`কত কয়েন কাটতে চান? (বর্তমান: ${curCoins})`);
+  if(!c||isNaN(c)) return;
+  const newC = Math.max(0, curCoins-parseInt(c));
+  showLoading(true);
+  const {db, doc, updateDoc} = window._fb;
+  try {
+    await updateDoc(doc(db,'users',uid),{coins: newC});
+    showToast(`✅ কয়েন কাটা হয়েছে। নতুন ব্যালেন্স: ${newC}`,'info');
+    await loadUsers();
+  } catch(e) { showToast('ত্রুটি','error'); }
+  showLoading(false);
+}
+
+async function addVPDirect() {
+  const trxId = document.getElementById('new-vp-trx').value.trim();
+  const amount = parseInt(document.getElementById('new-vp-amt').value);
+  if(!trxId||!amount) { showToast('Trx ID ও পরিমাণ দিন','error'); return; }
+  showLoading(true);
+  const {db, collection, addDoc, serverTimestamp} = window._fb;
+  try {
+    await addDoc(collection(db,'verified_payments'),{trxId, amount, status:'unused', createdAt:serverTimestamp()});
+    document.getElementById('new-vp-trx').value='';
+    document.getElementById('new-vp-amt').value='';
+    showToast('✅ Verified Payment যোগ হয়েছে','success');
+    await loadVerifiedPayments();
+  } catch(e) { showToast('ত্রুটি','error'); }
+  showLoading(false);
+}
+
+// ========== SETTINGS ==========
+async function saveDownloadCost() {
+  const cost = parseInt(document.getElementById('s-dl-cost').value);
+  if(!cost) { showToast('সঠিক মান দিন','error'); return; }
+  await saveSetting('downloadCost', cost);
+  showToast('✅ ডাউনলোড খরচ সেভ হয়েছে','success');
+}
+
+async function savePaymentSettings() {
+  const bkash = document.getElementById('s-bkash').value.trim();
+  const nagad = document.getElementById('s-nagad').value.trim();
+  const payType = document.getElementById('s-paytype').value;
+  if(!bkash||!nagad) { showToast('নম্বর দিন','error'); return; }
+  const {db, doc, setDoc, getDoc} = window._fb;
+  try {
+    const ref = doc(db,'settings','main');
+    const snap = await getDoc(ref);
+    const cur = snap.exists()?snap.data():{};
+    await setDoc(ref,{...cur, bkash, nagad, paymentType:payType});
+    showToast('✅ পেমেন্ট সেটিংস সেভ হয়েছে','success');
+  } catch(e) { showToast('ত্রুটি','error'); }
+}
+
+async function saveSetting(key, val) {
+  const {db, doc, setDoc, getDoc} = window._fb;
+  const ref = doc(db,'settings','main');
+  const snap = await getDoc(ref);
+  const cur = snap.exists()?snap.data():{};
+  await setDoc(ref,{...cur,[key]:val});
+}
+
+// ========== PACKAGES ==========
+function renderPackageEditor() {
+  document.getElementById('pkg-editor').innerHTML = packages.map((p,i)=>`
+    <div class="pkg-row" id="pkg-row-${i}">
+      <input type="number" value="${p.coins}" placeholder="কয়েন" oninput="packages[${i}].coins=+this.value;updatePkgPreview()">
+      <input type="number" value="${p.price}" placeholder="মূল্য (TK)" oninput="packages[${i}].price=+this.value;updatePkgPreview()">
+      <input type="text" value="${p.label||''}" placeholder="লেবেল" oninput="packages[${i}].label=this.value;updatePkgPreview()">
+      <button class="btn-rm-pkg" onclick="removePkgRow(${i})">✕</button>
+    </div>`).join('');
+  updatePkgPreview();
+}
+
+function addPkgRow() {
+  packages.push({coins:100,price:99,label:''});
+  renderPackageEditor();
+}
+
+function removePkgRow(i) {
+  if(packages.length<=1){showToast('কমপক্ষে ১টি প্যাকেজ রাখুন','error');return;}
+  packages.splice(i,1);
+  renderPackageEditor();
+}
+
+function updatePkgPreview() {
+  document.getElementById('pkg-preview').innerHTML = packages.map(p=>`
+    <div style="border:2px solid var(--border);border-radius:10px;padding:12px;text-align:center;background:var(--surface2)">
+      ${p.label?`<div style="font-size:0.65rem;background:var(--red);color:white;padding:2px 6px;border-radius:10px;margin-bottom:6px;display:inline-block">${p.label}</div>`:'<div style="height:18px;margin-bottom:6px"></div>'}
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold)">🪙 ${p.coins}</div>
+      <div style="font-size:0.88rem;font-weight:700;color:#4ade80">${p.price} ৳</div>
+    </div>`).join('');
+}
+
+async function savePackages() {
+  showLoading(true);
+  try {
+    await saveSetting('packages', packages);
+    showToast('✅ প্যাকেজ সেভ হয়েছে','success');
+  } catch(e) { showToast('ত্রুটি','error'); }
+  showLoading(false);
+}
+
+// ========== FILTER ==========
+function filterPayments() {
+  const q = document.getElementById('pay-search').value.toLowerCase();
+  const f = document.getElementById('pay-filter').value;
+  let res = allPayments;
+  if(f) res = res.filter(p=>p.status===f);
+  if(q) res = res.filter(p=>(p.userName||'').toLowerCase().includes(q)||(p.trxId||'').toLowerCase().includes(q)||(p.userEmail||'').toLowerCase().includes(q));
+  renderPayments(res);
+}
+
+function filterUsers() {
+  const q = document.getElementById('user-search').value.toLowerCase();
+  let res = allUsers;
+  if(q) res = res.filter(u=>(u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q));
+  renderUsers(res);
+}
+
+// ========== UI ==========
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='packages') renderPackageEditor();
+}
+
+function openModal(id){document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+function showToast(msg,type='info'){
+  const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),3600);
+}
+function showLoading(v){document.getElementById('loading').classList.toggle('hidden',!v);}
+</script>
+</body>
+</html>
