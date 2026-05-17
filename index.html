@@ -3,14 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart CV Maker — Admin Dashboard</title>
-<meta name="robots" content="noindex, nofollow">
+<title>Smart CV Maker - Best Professional Resume Builder in Bangladesh</title>
+<meta name="description" content="Smart CV Maker - বাংলাদেশের সেরা প্রফেশনাল রিজিউম বিল্ডার। ৬টি টেমপ্লেট, বাংলা ও ইংরেজি সাপোর্ট, সহজ PDF ডাউনলোড।">
+<meta name="keywords" content="CV maker Bangladesh, resume builder, বাংলাদেশ সিভি, professional CV">
+<meta property="og:title" content="Smart CV Maker - Best Professional Resume Builder in Bangladesh">
+<meta property="og:description" content="বাংলাদেশের সেরা প্রফেশনাল সিভি বিল্ডার। এখনই তৈরি করুন।">
 
 <!-- Firebase -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy, limit, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyDApg7ZYyMaz6btWjgRwT-nSrENmqfGTEU",
@@ -27,764 +30,1237 @@
   const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
 
-  window._fb = { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy, limit, serverTimestamp, deleteDoc };
+  window._fb = { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp };
 </script>
 
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
 <style>
 :root {
   --green: #006A4E;
   --red: #F42A41;
   --gold: #FFB800;
-  --blue: #1565c0;
-  --purple: #6A1B9A;
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface2: #283548;
-  --border: #334155;
-  --text: #e2e8f0;
-  --text-muted: #94a3b8;
-  --green-d: #059669;
+  --green-light: #e8f5f0;
+  --text-dark: #1a1a2e;
+  --text-mid: #3d4f5c;
+  --text-light: #7a8b96;
+  --bg: #f0f4f8;
+  --white: #ffffff;
+  --border: #dde4ec;
+  --shadow: 0 4px 24px rgba(0,106,78,0.12);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: var(--text-dark); }
 
-/* NAVBAR */
-.navbar { background: linear-gradient(90deg, #004d38, var(--green)); padding: 0 1.5rem; height: 58px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(0,0,0,0.4); }
-.navbar .logo { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 700; color: white; }
-.nav-user { display: flex; align-items: center; gap: 10px; }
-.admin-badge { background: var(--gold); color: #000; padding: 3px 10px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; }
-.btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 7px; font-family: inherit; font-size: 0.8rem; cursor: pointer; }
+/* ANTI-SCREENSHOT */
+body.blurred-mode .main-content { filter: blur(20px); pointer-events: none; }
 
-/* LAYOUT */
-.layout { display: flex; min-height: calc(100vh - 58px); }
-.sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 1.2rem 0.8rem; flex-shrink: 0; }
-.nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 0.87rem; color: var(--text-muted); transition: all 0.15s; border: none; background: transparent; text-align: left; width: 100%; font-family: inherit; margin-bottom: 3px; }
-.nav-item:hover { background: var(--surface2); color: var(--text); }
-.nav-item.active { background: rgba(0,106,78,0.25); color: #4ade80; font-weight: 600; }
-.nav-item .icon { font-size: 1rem; width: 22px; }
-.sidebar-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; padding: 0 12px; margin: 1rem 0 0.5rem; }
+/* ========== NAVBAR ========== */
+.navbar {
+  background: linear-gradient(90deg, #004d38 0%, var(--green) 60%, #005a42 100%);
+  padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between;
+  height: 60px; position: sticky; top: 0; z-index: 300;
+  box-shadow: 0 2px 16px rgba(0,106,78,0.3);
+}
+.navbar .logo { display: flex; align-items: center; gap: 10px; color: white; font-size: 1.1rem; font-weight: 700; }
+.navbar .logo .flag { font-size: 1.5rem; }
+.nav-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.coin-badge { background: rgba(255,184,0,0.2); border: 1px solid var(--gold); color: var(--gold); padding: 5px 13px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+.coin-badge:hover { background: var(--gold); color: #000; }
+.lang-toggle { display: flex; background: rgba(255,255,255,0.15); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.25); }
+.lang-btn { padding: 5px 12px; color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; background: transparent; font-family: inherit; transition: all 0.2s; }
+.lang-btn.active { background: white; color: var(--green); }
+.btn-login { background: var(--gold); color: #000; border: none; padding: 7px 16px; border-radius: 8px; font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+.btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 7px 14px; border-radius: 8px; font-family: inherit; font-size: 0.8rem; cursor: pointer; }
+.user-name { color: rgba(255,255,255,0.9); font-size: 0.8rem; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* MAIN */
-.main { flex: 1; padding: 1.5rem; overflow-y: auto; }
-.page { display: none; }
-.page.active { display: block; }
-.page-title { font-family: 'Noto Serif Bengali', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+/* ========== HERO ========== */
+.hero { background: linear-gradient(135deg, var(--green) 0%, #004d38 55%, #003528 100%); color: white; text-align: center; padding: 2.5rem 1rem 3rem; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+.hero p { font-size: 0.95rem; opacity: 0.82; max-width: 500px; margin: 0 auto 1rem; }
+.hero-badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.badge { background: rgba(255,255,255,0.13); border: 1px solid rgba(255,255,255,0.28); border-radius: 20px; padding: 4px 12px; font-size: 0.79rem; }
+.download-cost-info { margin-top: 10px; background: rgba(255,184,0,0.15); border: 1px solid rgba(255,184,0,0.4); border-radius: 8px; padding: 6px 14px; display: inline-block; font-size: 0.8rem; color: var(--gold); }
 
-/* STATS */
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
-.stat-card .val { font-size: 1.8rem; font-weight: 700; line-height: 1; }
-.stat-card .lbl { font-size: 0.78rem; color: var(--text-muted); margin-top: 5px; }
-.stat-card.green { border-left: 3px solid var(--green-d); }
-.stat-card.gold { border-left: 3px solid var(--gold); }
-.stat-card.red { border-left: 3px solid var(--red); }
-.stat-card.blue { border-left: 3px solid var(--blue); }
+/* ========== LAYOUT ========== */
+.app-layout { display: grid; grid-template-columns: 270px 1fr; min-height: calc(100vh - 148px); }
+.sidebar { background: white; border-right: 1px solid var(--border); padding: 1.1rem 0.85rem; overflow-y: auto; }
+.sidebar-title { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 0.6rem; padding: 0 0.4rem; }
+.template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.2rem; }
+.tpl-card { border: 2px solid var(--border); border-radius: 10px; cursor: pointer; overflow: hidden; transition: all 0.2s; }
+.tpl-card:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: var(--shadow); }
+.tpl-card.active { border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,106,78,0.15); }
+.tpl-thumb { height: 68px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+.tpl-thumb.classic { background: linear-gradient(135deg,#1a237e,#283593); }
+.tpl-thumb.modern { background: linear-gradient(135deg,#006A4E,#00897b); }
+.tpl-thumb.govt { background: linear-gradient(135deg,#B71C1C,#c62828); }
+.tpl-thumb.ngo { background: linear-gradient(135deg,#4527A0,#5e35b1); }
+.tpl-thumb.tech { background: linear-gradient(135deg,#0d47a1,#1565c0); }
+.tpl-thumb.academic { background: linear-gradient(135deg,#1B5E20,#2e7d32); }
+.tpl-name { font-size: 0.72rem; font-weight: 600; text-align: center; padding: 5px 4px; }
+.section-tabs { display: flex; flex-direction: column; gap: 3px; }
+.sec-tab { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; color: var(--text-mid); transition: all 0.15s; border: none; background: transparent; text-align: left; width: 100%; font-family: inherit; }
+.sec-tab:hover { background: var(--green-light); color: var(--green); }
+.sec-tab.active { background: var(--green-light); color: var(--green); font-weight: 600; }
+.sec-tab .icon { width: 26px; height: 26px; border-radius: 6px; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 0.88rem; flex-shrink: 0; }
+.sec-tab.active .icon { background: var(--green); filter: brightness(10); }
 
-/* TABLE */
-.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.2rem; }
-.table-card .card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.card-title { font-weight: 700; font-size: 0.95rem; }
-table { width: 100%; border-collapse: collapse; }
-th { padding: 10px 14px; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); background: var(--surface2); }
-td { padding: 11px 14px; font-size: 0.83rem; border-top: 1px solid var(--border); vertical-align: top; }
-tr:hover td { background: rgba(255,255,255,0.02); }
-.status-badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
-.status-badge.pending { background: rgba(255,184,0,0.15); color: var(--gold); }
-.status-badge.approved { background: rgba(74,222,128,0.15); color: #4ade80; }
-.status-badge.rejected { background: rgba(244,42,65,0.15); color: var(--red); }
-.status-badge.used { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+/* ========== MAIN AREA ========== */
+.main-area { display: grid; grid-template-columns: 1fr 1fr; }
+.editor-panel { padding: 1.2rem; overflow-y: auto; background: #fafbfc; border-right: 1px solid var(--border); max-height: calc(100vh - 148px); }
+.editor-section { display: none; }
+.editor-section.active { display: block; }
+.section-header { font-family: 'Noto Serif Bengali', serif; font-size: 1.05rem; font-weight: 700; color: var(--green); margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 2px solid var(--green-light); display: flex; align-items: center; gap: 7px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.field-row.full { grid-template-columns: 1fr; }
+.field-group { display: flex; flex-direction: column; gap: 3px; }
+.field-group label { font-size: 0.76rem; font-weight: 600; color: var(--text-mid); }
+.field-group input, .field-group textarea, .field-group select { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Hind Siliguri', sans-serif; font-size: 0.85rem; color: var(--text-dark); transition: border-color 0.15s; background: white; resize: vertical; }
+.field-group input:focus, .field-group textarea:focus, .field-group select:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,106,78,0.1); }
 
-/* BUTTONS */
-.btn { padding: 7px 16px; border-radius: 8px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
-.btn-approve { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
-.btn-approve:hover { background: #059669; color: white; }
-.btn-reject { background: rgba(244,42,65,0.1); color: var(--red); border: 1px solid rgba(244,42,65,0.3); }
-.btn-reject:hover { background: var(--red); color: white; }
-.btn-save { background: var(--green); color: white; }
-.btn-save:hover { background: #005040; }
-.btn-danger { background: rgba(244,42,65,0.15); color: var(--red); border: 1px solid rgba(244,42,65,0.3); }
-.btn-primary { background: var(--blue); color: white; }
-.btn-add-vp { background: rgba(0,106,78,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+/* PHOTO */
+.photo-upload-area { display: flex; align-items: center; gap: 14px; background: white; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+.photo-box { width: 80px; height: 98px; border-radius: 7px; border: 2px dashed var(--green); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: var(--green-light); flex-shrink: 0; }
+.photo-box img { width: 100%; height: 100%; object-fit: cover; }
+.photo-box .up-icon { font-size: 1.8rem; opacity: 0.4; }
+.photo-info h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+.photo-info p { font-size: 0.73rem; color: var(--text-light); line-height: 1.5; }
+.photo-btns { display: flex; gap: 7px; margin-top: 8px; flex-wrap: wrap; }
+.btn-up-photo { background: var(--green); color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 0.78rem; font-family: inherit; cursor: pointer; font-weight: 600; }
+.btn-rm-photo { background: #fff0f0; color: var(--red); border: 1px solid #ffd0d0; padding: 5px 11px; border-radius: 6px; font-size: 0.78rem; font-family: inherit; cursor: pointer; display: none; }
+#photo-file { display: none; }
 
-/* FORM */
-.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.2rem; }
-.form-title { font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: var(--text); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
-.form-group input, .form-group select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 11px; border-radius: 8px; font-family: inherit; font-size: 0.85rem; }
-.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--green); }
-.form-actions { margin-top: 14px; display: flex; gap: 10px; }
+.repeat-item { background: white; border: 1px solid var(--border); border-radius: 9px; padding: 0.9rem; margin-bottom: 8px; }
+.repeat-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.repeat-item-title { font-size: 0.85rem; font-weight: 600; }
+.btn-remove { background: #fff0f0; color: var(--red); border: 1px solid #ffd0d0; padding: 4px 9px; border-radius: 6px; cursor: pointer; font-size: 0.76rem; font-family: inherit; }
+.btn-add { display: flex; align-items: center; gap: 7px; width: 100%; padding: 8px; border: 1.5px dashed var(--green); border-radius: 8px; background: var(--green-light); color: var(--green); cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 600; justify-content: center; margin-top: 7px; transition: all 0.15s; }
+.btn-add:hover { background: var(--green); color: white; }
 
-/* PKG EDITOR */
-.pkg-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: center; background: var(--surface2); padding: 10px; border-radius: 8px; margin-bottom: 7px; }
-.pkg-row input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; border-radius: 7px; font-family: inherit; font-size: 0.83rem; width: 100%; }
-.btn-rm-pkg { background: none; border: none; color: var(--red); cursor: pointer; font-size: 1.1rem; padding: 0 5px; }
+/* ========== PREVIEW ========== */
+.preview-panel { background: #dde4ec; overflow-y: auto; padding: 1.2rem; max-height: calc(100vh - 148px); }
+.preview-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem; gap: 8px; flex-wrap: wrap; }
+.preview-label { font-size: 0.76rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+.btn-download { background: linear-gradient(135deg, #006A4E, #00897b); color: white; border: none; padding: 9px 20px; border-radius: 9px; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 2px 8px rgba(0,106,78,0.3); transition: all 0.2s; }
+.btn-download:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,106,78,0.4); }
+.btn-download:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.cost-pill { background: rgba(255,184,0,0.2); border: 1px solid var(--gold); color: #996600; padding: 4px 10px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; }
 
-/* LOGIN */
-.login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-.login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 360px; width: 100%; }
-.login-card h2 { font-family: 'Noto Serif Bengali', serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
-.login-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-.btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 12px 24px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; }
-.btn-google:hover { border-color: var(--green); background: rgba(0,106,78,0.15); }
-.btn-google img { width: 18px; }
-.access-denied { text-align: center; padding: 2rem; color: var(--red); }
-.access-denied h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+/* A4 CV */
+.cv-wrapper { background: white; width: 210mm; margin: 0 auto; box-shadow: 0 4px 30px rgba(0,0,0,0.18); min-height: 297mm; border-radius: 3px; overflow: hidden; position: relative; font-size: 0.82rem; }
+.cv-wrapper.watermarked::after { content: 'PREVIEW'; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-35deg); font-size: 5rem; font-weight: 900; color: rgba(244,42,65,0.12); pointer-events: none; z-index: 50; letter-spacing: 8px; }
+
+/* CV page break */
+.cv-page { min-height: 297mm; page-break-after: always; break-after: page; position: relative; box-sizing: border-box; }
+.cv-page:last-child { page-break-after: auto; break-after: auto; }
+
+/* CV COMMON */
+.cv-sec-title { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid; }
+.cv-sec-block { margin-bottom: 16px; }
+.cv-item-name { font-weight: 600; font-size: 0.85rem; }
+.cv-item-sub { font-size: 0.78rem; color: #555; }
+.cv-item-date { font-size: 0.73rem; color: #888; }
+.cv-item-desc { font-size: 0.78rem; color: #444; margin-top: 3px; line-height: 1.55; }
+.skill-bar { margin-bottom: 6px; }
+.skill-name-lbl { font-size: 0.77rem; color: var(--text-dark); margin-bottom: 2px; }
+.skill-track { background: #e0e4ec; border-radius: 4px; height: 4px; }
+.skill-fill { height: 4px; border-radius: 4px; }
+.info-row { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 6px; font-size: 0.77rem; }
+.info-label { color: #888; min-width: 72px; font-size: 0.73rem; }
+
+/* CLASSIC */
+.cv-classic .cv-header { background: #1a237e; color: white; padding: 22px 26px; overflow: hidden; }
+.cv-classic .cv-body { display: grid; grid-template-columns: 200px 1fr; }
+.cv-classic .cv-left { background: #f0f2f9; padding: 18px 14px; border-right: 1px solid #dce0ee; }
+.cv-classic .cv-right { padding: 18px 20px; }
+
+/* MODERN */
+.cv-modern .cv-header { background: var(--green); color: white; padding: 24px 26px; display: flex; align-items: center; gap: 16px; }
+.cv-modern .cv-body { display: grid; grid-template-columns: 1fr 2fr; }
+.cv-modern .cv-left { background: #f0f9f5; padding: 18px 14px; }
+.cv-modern .cv-right { padding: 18px 20px; }
+
+/* GOVT */
+.cv-govt-wrap table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-bottom: 12px; }
+.cv-govt-wrap td { padding: 5px 8px; border: 1px solid #ddd; vertical-align: top; }
+.cv-govt-wrap td:first-child { font-weight: 600; background: #fef5f5; width: 36%; }
+
+/* NGO */
+.cv-ngo .cv-header { background: linear-gradient(135deg,#4527A0,#7B1FA2); color: white; padding: 22px 24px; display: flex; align-items: center; gap: 16px; }
+.cv-ngo .accent-bar { height: 4px; background: linear-gradient(90deg,#f42a41,#ff9800,#4caf50); }
+.cv-ngo .cv-body { padding: 18px 22px; }
+.cv-ngo .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+/* TECH */
+.cv-tech-wrap { display: flex; min-height: 297mm; }
+.cv-tech-wrap .cv-sidebar { background: #0d47a1; color: white; width: 190px; flex-shrink: 0; padding: 20px 13px; }
+.cv-tech-wrap .cv-main { flex: 1; padding: 20px 22px; }
+
+/* ACADEMIC */
+.cv-academic { padding: 24px; }
+
+/* ========== MODALS ========== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+.modal-overlay.hidden { display: none; }
+.modal { background: white; border-radius: 16px; padding: 2rem; max-width: 460px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.25); animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal h2 { font-family: 'Noto Serif Bengali', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-dark); }
+.modal p { font-size: 0.88rem; color: var(--text-mid); margin-bottom: 1rem; line-height: 1.6; }
+.modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-light); }
+.modal { position: relative; }
+.btn-primary { background: var(--green); color: white; border: none; padding: 11px 24px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; }
+.btn-primary:hover { background: #005040; }
+.btn-secondary { background: var(--green-light); color: var(--green); border: 1px solid var(--green); padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 6px; }
+.btn-danger { background: var(--red); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 0.88rem; cursor: pointer; width: 100%; margin-top: 6px; }
+
+/* COIN PACKAGES */
+.coin-packages { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 1rem 0; }
+.pkg-card { border: 2px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+.pkg-card:hover, .pkg-card.selected { border-color: var(--gold); background: rgba(255,184,0,0.05); }
+.pkg-card .coins { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); }
+.pkg-card .price { font-size: 0.82rem; color: var(--text-mid); }
+.pkg-card .badge-pop { position: absolute; top: -8px; right: -8px; background: var(--red); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.pkg-card.selected .coins { color: #996600; }
+
+/* PAYMENT FORM */
+.payment-info-box { background: linear-gradient(135deg, #006A4E10, #006A4E05); border: 1px solid #006A4E30; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+.payment-numbers { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.pay-num-box { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 600; }
+.pay-type-badge { display: inline-block; background: var(--green); color: white; font-size: 0.68rem; padding: 1px 7px; border-radius: 4px; margin-right: 4px; }
+.pay-type-badge.nagad { background: #E84E10; }
 
 /* TOAST */
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 10px; font-size: 0.83rem; z-index: 999; animation: fadeIO 3.5s ease forwards; }
-.toast.success { border-left: 3px solid #4ade80; }
-.toast.error { border-left: 3px solid var(--red); }
-.toast.info { border-left: 3px solid var(--gold); }
-@keyframes fadeIO { 0%{opacity:0;transform:translateY(16px)} 12%{opacity:1;transform:none} 80%{opacity:1} 100%{opacity:0} }
+.toast { position: fixed; bottom: 20px; right: 20px; background: #1a1a2e; color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.85rem; z-index: 999; animation: fadeInOut 3s ease forwards; display: flex; align-items: center; gap: 8px; }
+@keyframes fadeInOut { 0%{opacity:0;transform:translateY(20px)} 15%{opacity:1;transform:translateY(0)} 75%{opacity:1} 100%{opacity:0} }
+.toast.success { border-left: 4px solid #4caf50; }
+.toast.error { border-left: 4px solid var(--red); }
+.toast.info { border-left: 4px solid var(--gold); }
+
+/* LOGIN SCREEN */
+.login-screen { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+.login-card { background: white; border-radius: 20px; padding: 3rem; text-align: center; max-width: 380px; width: 100%; box-shadow: var(--shadow); }
+.login-card .logo-big { font-size: 3.5rem; margin-bottom: 1rem; }
+.login-card h2 { font-family: 'Noto Serif Bengali', serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+.login-card p { color: var(--text-mid); font-size: 0.88rem; margin-bottom: 1.5rem; line-height: 1.6; }
+.btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; border: 2px solid var(--border); padding: 12px 24px; border-radius: 12px; font-family: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; }
+.btn-google:hover { border-color: var(--green); box-shadow: var(--shadow); }
+.btn-google img { width: 20px; height: 20px; }
+
+/* ABOUT / CONTACT */
+.about-section { background: white; padding: 3rem 1.5rem; border-top: 1px solid var(--border); }
+.about-section h2 { font-family: 'Noto Serif Bengali', serif; font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 1rem; color: var(--green); }
+.about-card { max-width: 600px; margin: 0 auto; text-align: center; }
+.about-card p { color: var(--text-mid); line-height: 1.8; margin-bottom: 1rem; }
+.contact-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+.contact-link { display: flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-decoration: none; color: white; }
+.contact-link.wa { background: #25D366; }
+.contact-link.email { background: #EA4335; }
+
+/* FLOATING WHATSAPP */
+.wa-float { position: fixed; bottom: 24px; right: 24px; z-index: 400; }
+.wa-btn { width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.6rem; box-shadow: 0 4px 16px rgba(37,211,102,0.4); transition: all 0.2s; }
+.wa-btn:hover { transform: scale(1.1); box-shadow: 0 6px 22px rgba(37,211,102,0.5); }
+
+/* PRINT */
+@media print {
+  .navbar,.hero,.sidebar,.editor-panel,.preview-controls,.about-section,.wa-float { display: none !important; }
+  .app-layout { grid-template-columns: 1fr; }
+  .main-area { grid-template-columns: 1fr; }
+  .preview-panel { padding: 0; background: white; max-height: none; overflow: visible; }
+  .cv-wrapper { box-shadow: none; width: 100%; border-radius: 0; }
+  .cv-wrapper.watermarked::after { display: none !important; }
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .app-layout { grid-template-columns: 1fr; }
+  .main-area { grid-template-columns: 1fr; }
+  .cv-modern .cv-body,.cv-classic .cv-body { grid-template-columns: 1fr; }
+  .cv-ngo .two-col { grid-template-columns: 1fr; }
+  .cv-tech-wrap { flex-direction: column; }
+  .cv-tech-wrap .cv-sidebar { width: 100%; }
+  .cv-wrapper { width: 100%; }
+}
 
 /* LOADING */
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; }
-.overlay.hidden { display: none; }
-.spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 600; display: flex; align-items: center; justify-content: center; }
+.loading-overlay.hidden { display: none; }
+.spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* MODAL */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; display: flex; align-items: center; justify-content: center; }
-.modal-overlay.hidden { display: none; }
-.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.8rem; max-width: 420px; width: 100%; }
-.modal h3 { font-weight: 700; margin-bottom: 1rem; }
-.modal-btns { display: flex; gap: 10px; margin-top: 1.2rem; }
-
-/* SEARCH */
-.search-bar { display: flex; gap: 10px; margin-bottom: 1rem; }
-.search-bar input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 14px; border-radius: 9px; font-family: inherit; font-size: 0.85rem; }
-.search-bar input:focus { outline: none; border-color: var(--green); }
-.filter-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 9px; font-family: inherit; font-size: 0.83rem; }
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .layout { flex-direction: column; }
-  .sidebar { width: 100%; padding: 0.7rem; display: flex; gap: 5px; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); }
-  .sidebar-title { display: none; }
-  .nav-item { white-space: nowrap; flex-direction: column; font-size: 0.7rem; padding: 8px 10px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .form-grid.cols3 { grid-template-columns: 1fr; }
-  .pkg-row { grid-template-columns: 1fr 1fr; }
-  table { font-size: 0.75rem; }
-}
+/* BALANCE LOW */
+.low-balance-warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 10px 14px; font-size: 0.8rem; color: #856404; margin-bottom: 8px; display: none; }
+.low-balance-warning.show { display: block; }
 </style>
 </head>
 <body>
 
 <!-- LOADING -->
-<div class="overlay hidden" id="loading"><div class="spinner"></div></div>
-
-<!-- ADD VERIFIED PAYMENT MODAL -->
-<div class="modal-overlay hidden" id="vp-modal">
-  <div class="modal">
-    <h3>✅ Verified Payment যোগ করুন</h3>
-    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem">এই Transaction ID দিয়ে user রিচার্জ করলে auto-approve হবে।</p>
-    <div class="form-grid">
-      <div class="form-group"><label>Transaction ID</label><input id="vp-trxid" placeholder="bKash/Nagad TrxID"></div>
-      <div class="form-group"><label>পরিমাণ (TK)</label><input id="vp-amount" type="number" placeholder="50"></div>
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-save" onclick="addVerifiedPayment()">যোগ করুন</button>
-      <button class="btn btn-danger" onclick="closeModal('vp-modal')">বাতিল</button>
-    </div>
-  </div>
+<div class="loading-overlay hidden" id="loading">
+  <div style="text-align:center"><div class="spinner"></div><p style="color:white;margin-top:12px;font-size:0.9rem">প্রসেস হচ্ছে...</p></div>
 </div>
 
-<!-- GIVE COINS MODAL -->
-<div class="modal-overlay hidden" id="coins-modal">
-  <div class="modal">
-    <h3>🪙 ম্যানুয়ালি কয়েন দিন</h3>
-    <div class="form-group" style="margin-bottom:12px"><label>User Email</label><input id="gc-email" placeholder="user@example.com"></div>
-    <div class="form-group" style="margin-bottom:12px"><label>কয়েনের পরিমাণ</label><input id="gc-coins" type="number" placeholder="50"></div>
-    <div class="modal-btns">
-      <button class="btn btn-save" onclick="giveCoins()">কয়েন দিন</button>
-      <button class="btn btn-danger" onclick="closeModal('coins-modal')">বাতিল</button>
+<!-- FLOATING WHATSAPP -->
+<a href="https://wa.me/8801999842041" target="_blank" class="wa-float">
+  <div class="wa-btn" title="WhatsApp এ যোগাযোগ করুন">💬</div>
+</a>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo"><span class="flag">🇧🇩</span><span>Smart CV Maker</span></div>
+  <div class="nav-right" id="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-bn" onclick="setLang('bn')">বাংলা</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">English</button>
+    </div>
+    <div id="nav-auth">
+      <button class="btn-login" onclick="doLogin()">🔐 লগইন করুন</button>
     </div>
   </div>
-</div>
+</nav>
 
-<!-- MAIN CONTENT -->
-<div id="admin-app" style="display:none">
-
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="logo">⚙️ Smart CV Maker — Admin</div>
-    <div class="nav-user">
-      <span class="admin-badge">👑 ADMIN</span>
-      <span id="admin-email" style="font-size:0.8rem;color:rgba(255,255,255,0.7)"></span>
-      <button class="btn-logout" onclick="doLogout()">বের হন</button>
-    </div>
-  </nav>
-
-  <div class="layout">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span> ড্যাশবোর্ড</button>
-      <button class="nav-item" onclick="showPage('payments',this)"><span class="icon">💳</span> পেমেন্ট রিকোয়েস্ট</button>
-      <button class="nav-item" onclick="showPage('users',this)"><span class="icon">👥</span> ইউজার ম্যানেজমেন্ট</button>
-      <button class="nav-item" onclick="showPage('verified',this)"><span class="icon">✅</span> Verified Payments</button>
-      <div class="sidebar-title">কনফিগারেশন</div>
-      <button class="nav-item" onclick="showPage('settings',this)"><span class="icon">⚙️</span> সেটিংস</button>
-      <button class="nav-item" onclick="showPage('packages',this)"><span class="icon">📦</span> প্যাকেজ ম্যানেজমেন্ট</button>
-    </div>
-
-    <!-- MAIN AREA -->
-    <div class="main">
-
-      <!-- DASHBOARD -->
-      <div class="page active" id="page-dashboard">
-        <div class="page-title">📊 ড্যাশবোর্ড</div>
-        <div class="stats-grid" id="stats-grid">
-          <div class="stat-card green"><div class="val" id="stat-users">—</div><div class="lbl">মোট ইউজার</div></div>
-          <div class="stat-card gold"><div class="val" id="stat-pending">—</div><div class="lbl">পেন্ডিং পেমেন্ট</div></div>
-          <div class="stat-card blue"><div class="val" id="stat-coins">—</div><div class="lbl">মোট কয়েন বিতরণ</div></div>
-          <div class="stat-card red"><div class="val" id="stat-revenue">—</div><div class="lbl">আনুমানিক রাজস্ব (TK)</div></div>
-        </div>
-        <div class="table-card">
-          <div class="card-header"><span class="card-title">🕐 সাম্প্রতিক পেমেন্ট রিকোয়েস্ট</span>
-            <button class="btn btn-approve" onclick="showPage('payments',null)">সব দেখুন →</button>
-          </div>
-          <table>
-            <thead><tr><th>ইউজার</th><th>পরিমাণ</th><th>কয়েন</th><th>Trx ID</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
-            <tbody id="recent-payments-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PAYMENTS -->
-      <div class="page" id="page-payments">
-        <div class="page-title">💳 পেমেন্ট রিকোয়েস্ট</div>
-        <div class="search-bar">
-          <input id="pay-search" placeholder="ইউজার নাম বা Trx ID দিয়ে খুঁজুন..." oninput="filterPayments()">
-          <select class="filter-select" id="pay-filter" onchange="filterPayments()">
-            <option value="">সব</option>
-            <option value="pending">পেন্ডিং</option>
-            <option value="approved">অনুমোদিত</option>
-            <option value="rejected">বাতিল</option>
-          </select>
-        </div>
-        <div class="table-card">
-          <div class="card-header">
-            <span class="card-title">সব পেমেন্ট রিকোয়েস্ট</span>
-            <button class="btn btn-add-vp" onclick="openModal('coins-modal')">🪙 ম্যানুয়াল কয়েন</button>
-          </div>
-          <table>
-            <thead><tr><th>ইউজার</th><th>ইমেইল</th><th>পরিমাণ</th><th>কয়েন</th><th>Trx ID</th><th>সময়</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
-            <tbody id="payments-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- USERS -->
-      <div class="page" id="page-users">
-        <div class="page-title">👥 ইউজার ম্যানেজমেন্ট</div>
-        <div class="search-bar">
-          <input id="user-search" placeholder="নাম বা ইমেইল দিয়ে খুঁজুন..." oninput="filterUsers()">
-        </div>
-        <div class="table-card">
-          <div class="card-header"><span class="card-title">রেজিস্টার্ড ইউজার</span>
-            <button class="btn btn-add-vp" onclick="openModal('coins-modal')">🪙 কয়েন দিন</button>
-          </div>
-          <table>
-            <thead><tr><th>নাম</th><th>ইমেইল</th><th>কয়েন</th><th>যোগদান</th><th>অ্যাকশন</th></tr></thead>
-            <tbody id="users-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- VERIFIED PAYMENTS -->
-      <div class="page" id="page-verified">
-        <div class="page-title">✅ Verified Payments</div>
-        <div class="form-card">
-          <div class="form-title">নতুন Verified Payment যোগ করুন</div>
-          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">এই TrxID + Amount দিলে user রিচার্জ করার সময় auto-approve হবে।</p>
-          <div class="form-grid">
-            <div class="form-group"><label>Transaction ID</label><input id="new-vp-trx" placeholder="TrxID"></div>
-            <div class="form-group"><label>পরিমাণ (TK)</label><input id="new-vp-amt" type="number" placeholder="50"></div>
-          </div>
-          <div class="form-actions"><button class="btn btn-save" onclick="addVPDirect()">✅ যোগ করুন</button></div>
-        </div>
-        <div class="table-card">
-          <div class="card-header"><span class="card-title">Verified Payment লিস্ট</span>
-            <button class="btn btn-primary" onclick="loadVerifiedPayments()">🔄 রিফ্রেশ</button>
-          </div>
-          <table>
-            <thead><tr><th>Trx ID</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>যোগ করা</th><th>ব্যবহার</th></tr></thead>
-            <tbody id="vp-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SETTINGS -->
-      <div class="page" id="page-settings">
-        <div class="page-title">⚙️ সেটিংস</div>
-
-        <div class="form-card">
-          <div class="form-title">💰 ডাউনলোড মূল্য</div>
-          <div class="form-grid">
-            <div class="form-group"><label>প্রতি ডাউনলোড খরচ (কয়েন)</label><input id="s-dl-cost" type="number" value="50"></div>
-          </div>
-          <div class="form-actions"><button class="btn btn-save" onclick="saveDownloadCost()">সেভ করুন</button></div>
-        </div>
-
-        <div class="form-card">
-          <div class="form-title">💳 পেমেন্ট নম্বর</div>
-          <div class="form-grid">
-            <div class="form-group"><label>bKash নম্বর</label><input id="s-bkash" placeholder="01999842041"></div>
-            <div class="form-group"><label>Nagad নম্বর</label><input id="s-nagad" placeholder="01972975646"></div>
-          </div>
-          <div class="form-group" style="margin-top:12px"><label>পেমেন্ট টাইপ</label>
-            <select id="s-paytype">
-              <option value="sendmoney">সেন্ড মানি (Send Money)</option>
-              <option value="payment">পেমেন্ট (Payment)</option>
-            </select>
-          </div>
-          <div class="form-actions"><button class="btn btn-save" onclick="savePaymentSettings()">সেভ করুন</button></div>
-        </div>
-      </div>
-
-      <!-- PACKAGES -->
-      <div class="page" id="page-packages">
-        <div class="page-title">📦 কয়েন প্যাকেজ ম্যানেজমেন্ট</div>
-        <div class="form-card">
-          <div class="form-title">প্যাকেজ এডিট করুন</div>
-          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:14px">কয়েন, দাম ও লেবেল পরিবর্তন করুন। পরিবর্তন সাথে সাথে ইউজারদের কাছে দেখাবে।</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:8px;padding:8px 10px;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase">
-            <span>কয়েন</span><span>মূল্য (TK)</span><span>লেবেল (ঐচ্ছিক)</span><span></span>
-          </div>
-          <div id="pkg-editor"></div>
-          <button class="btn btn-add-vp" onclick="addPkgRow()" style="margin-top:10px;width:100%">+ নতুন প্যাকেজ যোগ</button>
-          <div class="form-actions"><button class="btn btn-save" onclick="savePackages()">সব সেভ করুন</button></div>
-        </div>
-        <div class="form-card">
-          <div class="form-title" style="color:#4ade80">বর্তমান প্যাকেজ প্রিভিউ</div>
-          <div id="pkg-preview" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:12px"></div>
-        </div>
-      </div>
-
-    </div>
+<!-- HERO -->
+<div class="hero" id="hero-section">
+  <h1 id="hero-title">Smart CV Maker 🇧🇩</h1>
+  <p id="hero-sub">বাংলাদেশের সেরা প্রফেশনাল সিভি বিল্ডার — ৬টি টেমপ্লেট, বাংলা ও ইংরেজি</p>
+  <div class="hero-badges">
+    <span class="badge">✅ বিনামূল্যে এডিট</span>
+    <span class="badge">✅ বাংলা ও ইংরেজি</span>
+    <span class="badge">✅ ছবি আপলোড</span>
+    <span class="badge">✅ ৬টি টেমপ্লেট</span>
   </div>
+  <div class="download-cost-info" id="dl-cost-info">💰 PDF ডাউনলোড মাত্র ৫০ কয়েন (৫০ টাকা)</div>
 </div>
 
-<!-- LOGIN -->
-<div id="login-wrap" class="login-wrap">
+<!-- LOGIN SCREEN (shown when not logged in) -->
+<div id="login-screen" class="login-screen" style="display:none">
   <div class="login-card">
-    <div style="font-size:3rem;margin-bottom:1rem">⚙️</div>
-    <h2>Admin Login</h2>
-    <p>শুধুমাত্র অনুমোদিত admin এর জন্য। Google দিয়ে লগইন করুন।</p>
+    <div class="logo-big">📄</div>
+    <h2>Smart CV Maker</h2>
+    <p>প্রফেশনাল সিভি তৈরি করুন মাত্র কয়েক মিনিটে। শুরু করতে Google দিয়ে লগইন করুন।</p>
     <button class="btn-google" onclick="doLogin()">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
-      Google দিয়ে লগইন
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Google দিয়ে লগইন করুন
     </button>
-    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:1rem">⚠️ শুধুমাত্র admin ইমেইল দিয়ে প্রবেশ করা যাবে।</p>
   </div>
 </div>
 
-<!-- ACCESS DENIED -->
-<div id="access-denied" class="access-denied" style="display:none">
-  <h2>🚫 অ্যাক্সেস নেই</h2>
-  <p>এই ইমেইল admin নয়। সঠিক admin ইমেইল দিয়ে লগইন করুন।</p>
-  <button class="btn btn-danger" onclick="doLogout()" style="margin-top:1rem">লগআউট</button>
+<!-- MAIN APP (shown when logged in) -->
+<div id="main-app" class="main-content" style="display:none">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-title" id="lbl-tpl">টেমপ্লেট বেছে নিন</div>
+      <div class="template-grid">
+        <div class="tpl-card active" onclick="switchTemplate('classic',this)"><div class="tpl-thumb classic">📋</div><div class="tpl-name" id="t-classic">ক্লাসিক</div></div>
+        <div class="tpl-card" onclick="switchTemplate('modern',this)"><div class="tpl-thumb modern">🌿</div><div class="tpl-name" id="t-modern">মডার্ন</div></div>
+        <div class="tpl-card" onclick="switchTemplate('govt',this)"><div class="tpl-thumb govt">🏛️</div><div class="tpl-name" id="t-govt">সরকারি</div></div>
+        <div class="tpl-card" onclick="switchTemplate('ngo',this)"><div class="tpl-thumb ngo">🤝</div><div class="tpl-name" id="t-ngo">এনজিও</div></div>
+        <div class="tpl-card" onclick="switchTemplate('tech',this)"><div class="tpl-thumb tech">💻</div><div class="tpl-name" id="t-tech">টেক/আইটি</div></div>
+        <div class="tpl-card" onclick="switchTemplate('academic',this)"><div class="tpl-thumb academic">🎓</div><div class="tpl-name" id="t-academic">একাডেমিক</div></div>
+      </div>
+      <div class="sidebar-title" id="lbl-fill">তথ্য পূরণ করুন</div>
+      <div class="section-tabs">
+        <button class="sec-tab active" onclick="switchSection('personal',this)"><div class="icon">👤</div><span id="tab-p">ব্যক্তিগত তথ্য</span></button>
+        <button class="sec-tab" onclick="switchSection('education',this)"><div class="icon">🎓</div><span id="tab-e">শিক্ষাগত যোগ্যতা</span></button>
+        <button class="sec-tab" onclick="switchSection('experience',this)"><div class="icon">💼</div><span id="tab-x">কর্ম অভিজ্ঞতা</span></button>
+        <button class="sec-tab" onclick="switchSection('skills',this)"><div class="icon">⭐</div><span id="tab-s">দক্ষতা ও কোর্স</span></button>
+        <button class="sec-tab" onclick="switchSection('extra',this)"><div class="icon">🏆</div><span id="tab-o">অন্যান্য তথ্য</span></button>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <div class="editor-panel">
+        <!-- PERSONAL -->
+        <div class="editor-section active" id="sec-personal">
+          <div class="section-header">👤 <span id="sh-p">ব্যক্তিগত তথ্য</span></div>
+          <div class="photo-upload-area">
+            <div class="photo-box" id="photo-preview" onclick="document.getElementById('photo-file').click()"><span class="up-icon">📷</span></div>
+            <div class="photo-info">
+              <h4 id="photo-title">ছবি আপলোড করুন</h4>
+              <p id="photo-desc">পাসপোর্ট সাইজ ছবি। JPG/PNG। সর্বোচ্চ ৫ MB।</p>
+              <div class="photo-btns">
+                <button class="btn-up-photo" onclick="document.getElementById('photo-file').click()">📁 <span id="photo-btn">ছবি বেছে নিন</span></button>
+                <button class="btn-rm-photo" id="btn-rm" onclick="removePhoto()">✕ <span id="rm-btn">ছবি সরান</span></button>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="photo-file" accept="image/*" onchange="handlePhoto(event)">
+          <div class="field-row">
+            <div class="field-group"><label id="lbl-bn">পূর্ণ নাম (বাংলা)</label><input id="nameBn" oninput="sync()"></div>
+            <div class="field-group"><label id="lbl-en">Full Name (English)</label><input id="nameEn" oninput="sync()"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-group"><label id="lbl-ttl">পেশা / পদবী</label><input id="title" oninput="sync()"></div>
+            <div class="field-group"><label id="lbl-ph">মোবাইল নম্বর</label><input id="phone" oninput="sync()"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-group"><label id="lbl-em">ইমেইল</label><input id="email" oninput="sync()"></div>
+            <div class="field-group"><label id="lbl-addr">ঠিকানা / জেলা</label><input id="address" oninput="sync()"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-group"><label id="lbl-dob">জন্ম তারিখ</label><input id="dob" oninput="sync()"></div>
+            <div class="field-group"><label id="lbl-nat">জাতীয়তা</label><input id="nationality" oninput="sync()"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-group"><label id="lbl-rel">ধর্ম</label><input id="religion" oninput="sync()"></div>
+            <div class="field-group"><label id="lbl-mar">বৈবাহিক অবস্থা</label>
+              <select id="marital" onchange="sync()">
+                <option value="">-- নির্বাচন করুন --</option>
+                <option value="অবিবাহিত|Single">অবিবাহিত / Single</option>
+                <option value="বিবাহিত|Married">বিবাহিত / Married</option>
+                <option value="বিপত্নীক|Widowed">বিপত্নীক / Widowed</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-group"><label id="lbl-nid">NID নম্বর</label><input id="nid" oninput="sync()"></div>
+            <div class="field-group"><label id="lbl-web">LinkedIn / ওয়েবসাইট</label><input id="website" oninput="sync()"></div>
+          </div>
+          <div class="field-row full">
+            <div class="field-group"><label id="lbl-obj">সংক্ষিপ্ত পরিচিতি / Objective</label><textarea id="objective" rows="3" oninput="sync()"></textarea></div>
+          </div>
+        </div>
+
+        <!-- EDUCATION -->
+        <div class="editor-section" id="sec-education">
+          <div class="section-header">🎓 <span id="sh-e">শিক্ষাগত যোগ্যতা</span></div>
+          <div id="edu-list"></div>
+          <button class="btn-add" onclick="addEdu()">+ <span id="add-edu">নতুন শিক্ষা যোগ করুন</span></button>
+        </div>
+
+        <!-- EXPERIENCE -->
+        <div class="editor-section" id="sec-experience">
+          <div class="section-header">💼 <span id="sh-x">কর্ম অভিজ্ঞতা</span></div>
+          <div id="exp-list"></div>
+          <button class="btn-add" onclick="addExp()">+ <span id="add-exp">নতুন অভিজ্ঞতা যোগ করুন</span></button>
+        </div>
+
+        <!-- SKILLS -->
+        <div class="editor-section" id="sec-skills">
+          <div class="section-header">⭐ <span id="sh-s">দক্ষতা ও কোর্স</span></div>
+          <div id="skill-list"></div>
+          <button class="btn-add" onclick="addSkill()">+ <span id="add-skill">নতুন দক্ষতা যোগ করুন</span></button>
+          <br><br>
+          <div class="section-header" style="font-size:0.9rem">📜 <span id="sh-c">প্রশিক্ষণ / কোর্স</span></div>
+          <div id="course-list"></div>
+          <button class="btn-add" onclick="addCourse()">+ <span id="add-course">নতুন কোর্স যোগ করুন</span></button>
+        </div>
+
+        <!-- EXTRA -->
+        <div class="editor-section" id="sec-extra">
+          <div class="section-header">🏆 <span id="sh-o">অন্যান্য তথ্য</span></div>
+          <div class="field-row full"><div class="field-group"><label id="lbl-lang">ভাষা দক্ষতা</label><input id="languages" oninput="sync()"></div></div>
+          <div class="field-row full"><div class="field-group"><label id="lbl-awd">সম্মাননা ও পুরস্কার</label><textarea id="awards" rows="3" oninput="sync()"></textarea></div></div>
+          <div class="field-row full"><div class="field-group"><label id="lbl-vol">স্বেচ্ছাসেবী কার্যক্রম</label><textarea id="volunteer" rows="2" oninput="sync()"></textarea></div></div>
+          <div class="field-row full"><div class="field-group"><label id="lbl-hob">শখ ও আগ্রহ</label><input id="hobbies" oninput="sync()"></div></div>
+          <div class="section-header" style="font-size:0.9rem;margin-top:1rem">👥 <span id="sh-r">রেফারেন্স</span></div>
+          <div id="ref-list"></div>
+          <button class="btn-add" onclick="addRef()">+ <span id="add-ref">রেফারেন্স যোগ করুন</span></button>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-panel">
+        <div class="preview-controls">
+          <div>
+            <span class="preview-label">👁️ লাইভ প্রিভিউ</span>
+            <div class="low-balance-warning" id="low-bal-warn">⚠️ কম কয়েন! রিচার্জ করুন।</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="cost-pill">💰 ৫০ কয়েন = ১ ডাউনলোড</span>
+            <button class="btn-download" id="btn-dl" onclick="downloadCV()">⬇️ PDF ডাউনলোড</button>
+          </div>
+        </div>
+        <div class="cv-wrapper watermarked" id="cv-preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT SECTION -->
+  <div class="about-section">
+    <h2>👨‍💻 Developer সম্পর্কে</h2>
+    <div class="about-card">
+      <p>Smart CV Maker বাংলাদেশের সকল চাকরি প্রার্থীদের জন্য তৈরি একটি প্রফেশনাল সিভি বিল্ডার। সরকারি, বেসরকারি, এনজিও, টেক — সব ধরনের চাকরির জন্য উপযুক্ত টেমপ্লেট আছে।</p>
+      <p>যেকোনো সমস্যায় WhatsApp বা email-এ যোগাযোগ করুন।</p>
+      <div class="contact-links">
+        <a href="https://wa.me/8801999842041" target="_blank" class="contact-link wa">💬 WhatsApp</a>
+        <a href="mailto:mdraffi530@gmail.com" class="contact-link email">✉️ Email</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODALS ========== -->
+
+<!-- RECHARGE MODAL -->
+<div class="modal-overlay hidden" id="recharge-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('recharge-modal')">✕</button>
+    <h2>💰 কয়েন কিনুন</h2>
+    <p>আপনার বর্তমান ব্যালেন্স: <strong id="modal-balance">0 কয়েন</strong></p>
+    <div class="coin-packages" id="pkg-grid">
+      <!-- Dynamic from Firestore settings -->
+    </div>
+    <div class="payment-info-box">
+      <p style="font-size:0.82rem;font-weight:600;margin-bottom:6px">💳 পেমেন্ট পাঠান:</p>
+      <div class="payment-numbers" id="pay-numbers">
+        <!-- Dynamic -->
+      </div>
+      <p style="font-size:0.75rem;color:#666;margin-top:8px" id="pay-instruction">পেমেন্ট করার পর নিচে Transaction ID দিন।</p>
+    </div>
+    <div class="field-group" style="margin-bottom:10px">
+      <label>পরিমাণ (TK)</label>
+      <input id="pay-amount" type="number" placeholder="যেমন: 50" readonly style="background:#f5f5f5">
+    </div>
+    <div class="field-group" style="margin-bottom:10px">
+      <label>Transaction ID</label>
+      <input id="trx-id" placeholder="bKash/Nagad Transaction ID লিখুন">
+    </div>
+    <button class="btn-primary" onclick="submitPayment()">✅ পেমেন্ট যাচাই করুন</button>
+    <button class="btn-secondary" onclick="closeModal('recharge-modal')">বাতিল</button>
+  </div>
+</div>
+
+<!-- DOWNLOAD SUCCESS MODAL -->
+<div class="modal-overlay hidden" id="success-modal">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:1rem">✅</div>
+    <h2>ডাউনলোড সফল!</h2>
+    <p>আপনার CV PDF সফলভাবে তৈরি হচ্ছে। ৫০ কয়েন কেটে নেওয়া হয়েছে।</p>
+    <p style="font-size:0.82rem;margin-top:5px">অবশিষ্ট ব্যালেন্স: <strong id="remaining-bal"></strong></p>
+    <button class="btn-primary" onclick="closeModal('success-modal')">ঠিক আছে</button>
+  </div>
+</div>
+
+<!-- NO COINS MODAL -->
+<div class="modal-overlay hidden" id="nocoins-modal">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:1rem">😔</div>
+    <h2>পর্যাপ্ত কয়েন নেই</h2>
+    <p>PDF ডাউনলোডের জন্য <strong>৫০ কয়েন</strong> দরকার। আপনার কাছে এখন <strong id="cur-bal"></strong> কয়েন আছে।</p>
+    <button class="btn-primary" onclick="closeModal('nocoins-modal');openRechargeModal()">💰 কয়েন কিনুন</button>
+    <button class="btn-secondary" onclick="closeModal('nocoins-modal')">পরে করব</button>
+  </div>
 </div>
 
 <script>
-const ADMIN_EMAIL = 'mdraffi530@gmail.com';
+// ========== STATE ==========
+let lang = 'bn';
+let tpl = 'classic';
+let photo = null;
+let currentUser = null;
+let userCoins = 0;
+let selectedPkg = null;
+let appSettings = {
+  downloadCost: 50,
+  packages: [
+    {coins:50, price:50, label:''},
+    {coins:100, price:99, label:''},
+    {coins:150, price:149, label:'সাশ্রয়ী'},
+    {coins:200, price:199, label:''},
+    {coins:1000, price:950, label:'🔥 সেরা ডিল'}
+  ],
+  bkash: '01999842041',
+  nagad: '01972975646',
+  paymentType: 'sendmoney' // 'sendmoney' or 'payment'
+};
 
-let allPayments = [];
-let allUsers = [];
-let packages = [
-  {coins:50, price:50, label:''},
-  {coins:100, price:99, label:''},
-  {coins:150, price:149, label:'সাশ্রয়ী'},
-  {coins:200, price:199, label:''},
-  {coins:1000, price:950, label:'🔥 সেরা ডিল'}
+let d = {
+  nameBn:'মোহাম্মদ রহিম উদ্দিন', nameEn:'Mohammad Rahim Uddin',
+  title:'সিনিয়র সফটওয়্যার ইঞ্জিনিয়ার', phone:'+880 1712-345678',
+  email:'rahim@example.com', address:'মিরপুর, ঢাকা-১২১৬',
+  dob:'১৫ মার্চ ১৯৯০', nationality:'বাংলাদেশী', religion:'ইসলাম',
+  marital:'বিবাহিত|Married', nid:'19901234567890',
+  website:'linkedin.com/in/rahim',
+  objective:'আমি একজন অভিজ্ঞ ও দক্ষ সফটওয়্যার ইঞ্জিনিয়ার। আমি সর্বদা নতুন প্রযুক্তি শিখতে ও প্রতিষ্ঠানের উন্নয়নে অবদান রাখতে আগ্রহী।',
+  languages:'বাংলা (মাতৃভাষা), ইংরেজি (দক্ষ)',
+  awards:'• ২০২২ সালে সেরা কর্মী পুরস্কার',
+  volunteer:'• আলোর পথে — শিক্ষা প্রকল্পে স্বেচ্ছাসেবী',
+  hobbies:'পড়াশোনা, ভ্রমণ, ফটোগ্রাফি'
+};
+let edus = [
+  {degree:'বি.এস.সি কম্পিউটার সায়েন্স',institute:'বুয়েট, ঢাকা',year:'২০১২',result:'সিজিপিএ ৩.৭৫/৪.০০',board:''},
+  {degree:'এইচ.এস.সি (বিজ্ঞান)',institute:'ঢাকা কলেজ',year:'২০০৮',result:'জিপিএ ৫.০০',board:'ঢাকা বোর্ড'}
 ];
+let exps = [
+  {position:'সিনিয়র সফটওয়্যার ইঞ্জিনিয়ার',company:'ব্র্যাক আইটি',from:'২০১৮',to:'বর্তমান',desc:'মাইক্রোসার্ভিস আর্কিটেকচার ডিজাইন ও বাস্তবায়ন।'},
+  {position:'সফটওয়্যার ইঞ্জিনিয়ার',company:'গ্রামীণফোন',from:'২০১৩',to:'২০১৮',desc:'ব্যাকএন্ড সিস্টেম ডেভেলপমেন্ট।'}
+];
+let skills = [{name:'Python / Django',level:90},{name:'JavaScript / React',level:85},{name:'MySQL',level:80}];
+let courses = [{name:'AWS Certified Developer',org:'Amazon',year:'২০২১'}];
+let refs = [{name:'প্রফেসর ড. আলী হাসান',title:'বিভাগীয় প্রধান, বুয়েট',phone:'+880 1700-111222',email:'ali@buet.ac.bd'}];
 
+// ========== ANTI-PIRACY ==========
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey&&['p','s','u','a'].includes(e.key.toLowerCase())) || e.key==='F12' || (e.ctrlKey&&e.shiftKey&&['i','j','c'].includes(e.key.toLowerCase()))) {
+    e.preventDefault(); return false;
+  }
+});
+document.addEventListener('contextmenu', e => e.preventDefault());
+window.onblur = () => document.body.classList.add('blurred-mode');
+window.onfocus = () => document.body.classList.remove('blurred-mode');
+
+// ========== FIREBASE AUTH ==========
 function waitFirebase(cb) {
   if(window._fb) cb();
   else setTimeout(()=>waitFirebase(cb),100);
 }
 
 waitFirebase(()=>{
-  const {auth, onAuthStateChanged} = window._fb;
-  onAuthStateChanged(auth, user => {
+  const {auth, onAuthStateChanged, db, doc, getDoc, setDoc} = window._fb;
+  onAuthStateChanged(auth, async user => {
     if(user) {
-      if(user.email === ADMIN_EMAIL) {
-        document.getElementById('login-wrap').style.display='none';
-        document.getElementById('access-denied').style.display='none';
-        document.getElementById('admin-app').style.display='block';
-        document.getElementById('admin-email').textContent = user.email;
-        initAdmin();
+      currentUser = user;
+      // Create user doc if not exists
+      const uref = doc(db,'users',user.uid);
+      const snap = await getDoc(uref);
+      if(!snap.exists()) {
+        await setDoc(uref,{email:user.email,name:user.displayName,coins:0,createdAt:new Date().toISOString()});
+        userCoins = 0;
       } else {
-        document.getElementById('login-wrap').style.display='none';
-        document.getElementById('admin-app').style.display='none';
-        document.getElementById('access-denied').style.display='block';
+        userCoins = snap.data().coins || 0;
       }
+      // Load settings
+      await loadSettings();
+      showApp();
     } else {
-      document.getElementById('login-wrap').style.display='flex';
-      document.getElementById('admin-app').style.display='none';
-      document.getElementById('access-denied').style.display='none';
+      currentUser = null;
+      showLogin();
     }
   });
 });
 
+async function loadSettings() {
+  try {
+    const {db, doc, getDoc} = window._fb;
+    const snap = await getDoc(doc(db,'settings','main'));
+    if(snap.exists()) {
+      const s = snap.data();
+      if(s.downloadCost) appSettings.downloadCost = s.downloadCost;
+      if(s.packages) appSettings.packages = s.packages;
+      if(s.bkash) appSettings.bkash = s.bkash;
+      if(s.nagad) appSettings.nagad = s.nagad;
+      if(s.paymentType) appSettings.paymentType = s.paymentType;
+    }
+    document.getElementById('dl-cost-info').textContent = `💰 PDF ডাউনলোড মাত্র ${appSettings.downloadCost} কয়েন`;
+  } catch(e) { /* use defaults */ }
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  document.getElementById('nav-auth').innerHTML = `
+    <span class="user-name">👤 ${currentUser.displayName?.split(' ')[0]}</span>
+    <div class="coin-badge" onclick="openRechargeModal()">💰 ${userCoins} কয়েন</div>
+    <button class="btn-logout" onclick="doLogout()">বের হন</button>
+  `;
+  updateLowBalWarning();
+  initApp();
+}
+
+function showLogin() {
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('nav-auth').innerHTML = `<button class="btn-login" onclick="doLogin()">🔐 লগইন করুন</button>`;
+}
+
 async function doLogin() {
   const {auth, provider, signInWithPopup} = window._fb;
   try { await signInWithPopup(auth, provider); }
-  catch(e) { showToast('লগইন ব্যর্থ: '+e.message,'error'); }
+  catch(e) { showToast('লগইন ব্যর্থ হয়েছে: '+e.message,'error'); }
 }
+
 async function doLogout() {
   const {auth, signOut} = window._fb;
   await signOut(auth);
 }
 
-async function initAdmin() {
-  showLoading(true);
-  await loadSettings();
-  await loadDashboard();
-  await loadPayments();
-  await loadUsers();
-  await loadVerifiedPayments();
-  showLoading(false);
+function updateCoinDisplay() {
+  const cb = document.querySelector('.coin-badge');
+  if(cb) cb.textContent = `💰 ${userCoins} কয়েন`;
+  updateLowBalWarning();
 }
 
-// ========== LOAD DATA ==========
-async function loadSettings() {
-  const {db, doc, getDoc} = window._fb;
+function updateLowBalWarning() {
+  const el = document.getElementById('low-bal-warn');
+  if(el) el.classList.toggle('show', userCoins < appSettings.downloadCost && userCoins >= 0);
+}
+
+// ========== DOWNLOAD / PAYMENT ==========
+async function downloadCV() {
+  if(!currentUser) { showToast('আগে লগইন করুন','error'); return; }
+  if(userCoins < appSettings.downloadCost) {
+    document.getElementById('cur-bal').textContent = userCoins;
+    openModal('nocoins-modal'); return;
+  }
+  // Deduct coins
+  showLoading(true);
   try {
-    const snap = await getDoc(doc(db,'settings','main'));
-    if(snap.exists()) {
-      const s = snap.data();
-      if(s.downloadCost) document.getElementById('s-dl-cost').value = s.downloadCost;
-      if(s.bkash) document.getElementById('s-bkash').value = s.bkash;
-      if(s.nagad) document.getElementById('s-nagad').value = s.nagad;
-      if(s.paymentType) document.getElementById('s-paytype').value = s.paymentType;
-      if(s.packages) { packages = s.packages; }
+    const {db, doc, updateDoc} = window._fb;
+    const newCoins = userCoins - appSettings.downloadCost;
+    await updateDoc(doc(db,'users',currentUser.uid),{coins: newCoins});
+    userCoins = newCoins;
+    updateCoinDisplay();
+    // Remove watermark temporarily and generate PDF
+    const wrapper = document.getElementById('cv-preview');
+    wrapper.classList.remove('watermarked');
+    showLoading(false);
+    // Use html2canvas + jsPDF
+    await generatePDF();
+    wrapper.classList.add('watermarked');
+    document.getElementById('remaining-bal').textContent = userCoins + ' কয়েন';
+    openModal('success-modal');
+  } catch(e) {
+    showLoading(false);
+    showToast('ডাউনলোড ব্যর্থ: '+e.message,'error');
+  }
+}
+
+async function generatePDF() {
+  return new Promise(async (resolve) => {
+    // Load jsPDF + html2canvas
+    if(!window.jspdf) {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    }
+    if(!window.html2canvas) {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    }
+    const el = document.getElementById('cv-preview');
+    const canvas = await html2canvas(el, {scale:2, useCORS:true, logging:false, width:794, windowWidth:794});
+    const imgData = canvas.toDataURL('image/jpeg',0.95);
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF('p','mm','a4');
+    const pW = pdf.internal.pageSize.getWidth();
+    const pH = pdf.internal.pageSize.getHeight();
+    const canvH = (canvas.height * pW) / canvas.width;
+    if(canvH <= pH) {
+      pdf.addImage(imgData,'JPEG',0,0,pW,canvH);
     } else {
-      // Init default settings
-      document.getElementById('s-bkash').value = '01999842041';
-      document.getElementById('s-nagad').value = '01972975646';
+      // Multi page
+      let pos = 0;
+      while(pos < canvH) {
+        if(pos > 0) pdf.addPage();
+        pdf.addImage(imgData,'JPEG',0,-pos,pW,canvH);
+        pos += pH;
+      }
     }
-  } catch(e) {}
-  renderPackageEditor();
+    const name = (d.nameEn||d.nameBn||'CV').replace(/\s+/g,'-');
+    pdf.save(`${name}-CV.pdf`);
+    resolve();
+  });
 }
 
-async function loadDashboard() {
-  const {db, collection, getDocs, query, where} = window._fb;
-  try {
-    // Users count
-    const uSnap = await getDocs(collection(db,'users'));
-    document.getElementById('stat-users').textContent = uSnap.size;
-
-    // Pending payments
-    const pSnap = await getDocs(query(collection(db,'pending_payments'), where('status','==','pending')));
-    document.getElementById('stat-pending').textContent = pSnap.size;
-
-    // Recent payments
-    const aSnap = await getDocs(collection(db,'pending_payments'));
-    let totalCoins = 0, totalRev = 0;
-    const recents = [];
-    aSnap.forEach(d=>{
-      const dat = d.data();
-      if(dat.status==='approved') { totalCoins+=dat.coins||0; totalRev+=dat.amount||0; }
-      recents.push({id:d.id,...dat});
-    });
-    document.getElementById('stat-coins').textContent = totalCoins;
-    document.getElementById('stat-revenue').textContent = totalRev + ' ৳';
-
-    // Recent 5
-    const sorted = recents.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).slice(0,5);
-    document.getElementById('recent-payments-body').innerHTML = sorted.map(p=>payRow(p,true)).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px">কোনো পেমেন্ট নেই</td></tr>';
-  } catch(e) { console.error(e); }
+function loadScript(src) {
+  return new Promise(res=>{ const s=document.createElement('script'); s.src=src; s.onload=res; document.head.appendChild(s); });
 }
 
-async function loadPayments() {
-  const {db, collection, getDocs} = window._fb;
-  try {
-    const snap = await getDocs(collection(db,'pending_payments'));
-    allPayments = [];
-    snap.forEach(d=>allPayments.push({id:d.id,...d.data()}));
-    allPayments.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    renderPayments(allPayments);
-  } catch(e) {}
+// ========== RECHARGE / PAYMENT ==========
+function openRechargeModal() {
+  const {downloadCost} = appSettings;
+  document.getElementById('modal-balance').textContent = userCoins + ' কয়েন';
+  // Build packages
+  const grid = document.getElementById('pkg-grid');
+  grid.innerHTML = appSettings.packages.map((p,i)=>`
+    <div class="pkg-card" onclick="selectPkg(${i},${p.price})" id="pkg-${i}">
+      ${p.label?`<span class="badge-pop">${p.label}</span>`:''}
+      <div class="coins">🪙 ${p.coins}</div>
+      <div style="font-size:0.85rem;font-weight:700;color:var(--green)">${p.price} টাকা</div>
+      <div class="price">${p.coins} কয়েন</div>
+    </div>`).join('');
+  // Payment numbers
+  const type = appSettings.paymentType === 'payment' ? 'পেমেন্ট' : 'সেন্ড মানি';
+  document.getElementById('pay-numbers').innerHTML = `
+    <div class="pay-num-box"><span class="pay-type-badge">bKash</span>${appSettings.bkash}</div>
+    <div class="pay-num-box"><span class="pay-type-badge nagad">Nagad</span>${appSettings.nagad}</div>
+  `;
+  document.getElementById('pay-instruction').textContent = `উপরের নম্বরে "${type}" করুন তারপর Transaction ID দিন।`;
+  openModal('recharge-modal');
 }
 
-async function loadUsers() {
-  const {db, collection, getDocs} = window._fb;
-  try {
-    const snap = await getDocs(collection(db,'users'));
-    allUsers = [];
-    snap.forEach(d=>allUsers.push({id:d.id,...d.data()}));
-    renderUsers(allUsers);
-  } catch(e) {}
+function selectPkg(i, price) {
+  selectedPkg = appSettings.packages[i];
+  document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('pkg-'+i).classList.add('selected');
+  document.getElementById('pay-amount').value = price;
 }
 
-async function loadVerifiedPayments() {
-  const {db, collection, getDocs} = window._fb;
-  try {
-    const snap = await getDocs(collection(db,'verified_payments'));
-    const rows = [];
-    snap.forEach(d=>rows.push({id:d.id,...d.data()}));
-    document.getElementById('vp-body').innerHTML = rows.map(r=>`
-      <tr>
-        <td><code style="font-size:0.78rem;color:var(--gold)">${r.trxId}</code></td>
-        <td>${r.amount} ৳</td>
-        <td><span class="status-badge ${r.status==='used'?'used':'approved'}">${r.status==='used'?'ব্যবহৃত':'অপেক্ষমাণ'}</span></td>
-        <td style="font-size:0.74rem;color:var(--text-muted)">${r.createdAt?new Date(r.createdAt.seconds*1000).toLocaleDateString('bn-BD'):'-'}</td>
-        <td style="font-size:0.74rem;color:var(--text-muted)">${r.usedBy||'-'}</td>
-      </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">কোনো verified payment নেই</td></tr>';
-  } catch(e) {}
-}
+async function submitPayment() {
+  const trxId = document.getElementById('trx-id').value.trim();
+  const amount = document.getElementById('pay-amount').value;
+  if(!trxId){ showToast('Transaction ID দিন','error'); return; }
+  if(!amount){ showToast('প্যাকেজ বেছে নিন','error'); return; }
+  if(!selectedPkg){ showToast('একটি প্যাকেজ বেছে নিন','error'); return; }
 
-// ========== RENDER ==========
-function payRow(p, short=false) {
-  const date = p.createdAt ? new Date(p.createdAt.seconds*1000).toLocaleDateString('bn-BD') : '-';
-  const statusBadge = `<span class="status-badge ${p.status}">${p.status==='pending'?'পেন্ডিং':p.status==='approved'?'অনুমোদিত':'বাতিল'}</span>`;
-  const actions = p.status==='pending' ? `<div style="display:flex;gap:6px">
-    <button class="btn btn-approve" onclick="approvePayment('${p.id}','${p.userId}',${p.coins},${p.amount})" title="অনুমোদন">✅</button>
-    <button class="btn btn-reject" onclick="rejectPayment('${p.id}')" title="বাতিল">❌</button>
-  </div>` : `<span style="font-size:0.75rem;color:var(--text-muted)">—</span>`;
-  if(short) return `<tr>
-    <td>${p.userName||p.userEmail||'-'}</td>
-    <td>${p.amount} ৳</td>
-    <td>${p.coins} 🪙</td>
-    <td><code style="font-size:0.72rem">${(p.trxId||'').slice(0,12)}...</code></td>
-    <td>${statusBadge}</td>
-    <td>${actions}</td>
-  </tr>`;
-  return `<tr>
-    <td>${p.userName||'-'}</td>
-    <td style="font-size:0.75rem">${p.userEmail||'-'}</td>
-    <td>${p.amount} ৳</td>
-    <td>${p.coins} 🪙</td>
-    <td><code style="font-size:0.74rem;color:var(--gold)">${p.trxId||'-'}</code></td>
-    <td style="font-size:0.74rem;color:var(--text-muted)">${date}</td>
-    <td>${statusBadge}</td>
-    <td>${actions}</td>
-  </tr>`;
-}
-
-function renderPayments(list) {
-  document.getElementById('payments-body').innerHTML = list.map(p=>payRow(p)).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px">কোনো পেমেন্ট নেই</td></tr>';
-}
-
-function renderUsers(list) {
-  document.getElementById('users-body').innerHTML = list.map(u=>`
-    <tr>
-      <td>${u.name||'-'}</td>
-      <td style="font-size:0.78rem">${u.email||'-'}</td>
-      <td><strong style="color:var(--gold)">${u.coins||0} 🪙</strong></td>
-      <td style="font-size:0.73rem;color:var(--text-muted)">${u.createdAt?new Date(u.createdAt).toLocaleDateString('bn-BD'):'-'}</td>
-      <td>
-        <button class="btn btn-add-vp" onclick="quickAddCoins('${u.id}','${u.email}',${u.coins||0})" style="font-size:0.73rem">🪙 কয়েন</button>
-        <button class="btn btn-danger" onclick="deductCoins('${u.id}',${u.coins||0})" style="font-size:0.73rem;margin-left:5px">− কাটুন</button>
-      </td>
-    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">কোনো ইউজার নেই</td></tr>';
-}
-
-// ========== ACTIONS ==========
-async function approvePayment(payId, userId, coins, amount) {
-  if(!confirm(`এই পেমেন্ট অনুমোদন করবেন? ${coins} কয়েন যোগ হবে।`)) return;
   showLoading(true);
-  const {db, doc, updateDoc, getDoc} = window._fb;
-  try {
-    const uSnap = await getDoc(doc(db,'users',userId));
-    if(!uSnap.exists()) { showToast('ইউজার খুঁজে পাওয়া যায়নি','error'); showLoading(false); return; }
-    const curCoins = uSnap.data().coins||0;
-    await updateDoc(doc(db,'users',userId),{coins: curCoins+coins});
-    await updateDoc(doc(db,'pending_payments',payId),{status:'approved', approvedAt: new Date().toISOString()});
-    showToast(`✅ অনুমোদিত! ${coins} কয়েন যোগ হয়েছে।`,'success');
-    await loadPayments(); await loadDashboard();
-  } catch(e) { showToast('ত্রুটি: '+e.message,'error'); }
-  showLoading(false);
-}
+  const {db, doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp} = window._fb;
 
-async function rejectPayment(payId) {
-  if(!confirm('এই পেমেন্ট বাতিল করবেন?')) return;
-  showLoading(true);
-  const {db, doc, updateDoc} = window._fb;
   try {
-    await updateDoc(doc(db,'pending_payments',payId),{status:'rejected', rejectedAt: new Date().toISOString()});
-    showToast('❌ পেমেন্ট বাতিল করা হয়েছে।','info');
-    await loadPayments(); await loadDashboard();
-  } catch(e) { showToast('ত্রুটি: '+e.message,'error'); }
-  showLoading(false);
-}
-
-async function giveCoins() {
-  const email = document.getElementById('gc-email').value.trim();
-  const coins = parseInt(document.getElementById('gc-coins').value);
-  if(!email||!coins) { showToast('সব তথ্য দিন','error'); return; }
-  showLoading(true);
-  const {db, collection, getDocs, query, where, doc, updateDoc} = window._fb;
-  try {
-    const q = query(collection(db,'users'), where('email','==',email));
+    // Check verified_payments
+    const q = query(collection(db,'verified_payments'), where('trxId','==',trxId));
     const snap = await getDocs(q);
-    if(snap.empty) { showToast('ইউজার পাওয়া যায়নি','error'); showLoading(false); return; }
-    for(const d of snap.docs) {
-      const cur = d.data().coins||0;
-      await updateDoc(doc(db,'users',d.id),{coins: cur+coins});
+    let found = false;
+    for(const d2 of snap.docs) {
+      const pd = d2.data();
+      if(pd.status==='unused' && parseInt(pd.amount)===parseInt(amount)) {
+        // Auto approve
+        await updateDoc(doc(db,'verified_payments',d2.id),{status:'used',usedBy:currentUser.uid,usedAt:serverTimestamp()});
+        const newCoins = userCoins + selectedPkg.coins;
+        await updateDoc(doc(db,'users',currentUser.uid),{coins:newCoins});
+        userCoins = newCoins;
+        updateCoinDisplay();
+        found = true;
+        showLoading(false);
+        closeModal('recharge-modal');
+        showToast(`✅ ${selectedPkg.coins} কয়েন যোগ হয়েছে! মোট: ${userCoins}`, 'success');
+        break;
+      }
     }
-    closeModal('coins-modal');
-    showToast(`✅ ${coins} কয়েন দেওয়া হয়েছে।`,'success');
-    await loadUsers(); await loadDashboard();
-  } catch(e) { showToast('ত্রুটি: '+e.message,'error'); }
-  showLoading(false);
+    if(!found) {
+      // Save to pending
+      await addDoc(collection(db,'pending_payments'),{
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        userName: currentUser.displayName,
+        trxId: trxId,
+        amount: parseInt(amount),
+        coins: selectedPkg.coins,
+        status: 'pending',
+        createdAt: serverTimestamp()
+      });
+      showLoading(false);
+      closeModal('recharge-modal');
+      showToast('⏳ পেমেন্ট যাচাইয়ের অপেক্ষায়। ২৪ ঘন্টার মধ্যে কয়েন যোগ হবে।','info');
+    }
+  } catch(e) {
+    showLoading(false);
+    showToast('ত্রুটি: '+e.message,'error');
+  }
 }
 
-async function quickAddCoins(uid, email, curCoins) {
-  const c = prompt(`${email} কে কত কয়েন দিতে চান? (বর্তমান: ${curCoins})`);
-  if(!c||isNaN(c)) return;
-  showLoading(true);
-  const {db, doc, updateDoc} = window._fb;
-  try {
-    await updateDoc(doc(db,'users',uid),{coins: curCoins+parseInt(c)});
-    showToast(`✅ ${c} কয়েন যোগ হয়েছে।`,'success');
-    await loadUsers();
-  } catch(e) { showToast('ত্রুটি','error'); }
-  showLoading(false);
+// ========== TRANSLATIONS ==========
+const T = {
+  bn:{
+    t_classic:'ক্লাসিক',t_modern:'মডার্ন',t_govt:'সরকারি',t_ngo:'এনজিও',t_tech:'টেক/আইটি',t_academic:'একাডেমিক',
+    tab_p:'ব্যক্তিগত তথ্য',tab_e:'শিক্ষাগত যোগ্যতা',tab_x:'কর্ম অভিজ্ঞতা',tab_s:'দক্ষতা ও কোর্স',tab_o:'অন্যান্য তথ্য',
+    sh_p:'ব্যক্তিগত তথ্য',sh_e:'শিক্ষাগত যোগ্যতা',sh_x:'কর্ম অভিজ্ঞতা',sh_s:'দক্ষতা ও কোর্স',sh_c:'প্রশিক্ষণ / কোর্স',sh_o:'অন্যান্য তথ্য',sh_r:'রেফারেন্স',
+    photo_title:'ছবি আপলোড',photo_desc:'JPG/PNG, সর্বোচ্চ ৫ MB',photo_btn:'ছবি বেছে নিন',rm_btn:'সরান',
+    lbl_bn:'পূর্ণ নাম (বাংলা)',lbl_en:'Full Name (English)',lbl_ttl:'পেশা / পদবী',lbl_ph:'মোবাইল',
+    lbl_em:'ইমেইল',lbl_addr:'ঠিকানা',lbl_dob:'জন্ম তারিখ',lbl_nat:'জাতীয়তা',
+    lbl_rel:'ধর্ম',lbl_mar:'বৈবাহিক অবস্থা',lbl_nid:'NID',lbl_web:'LinkedIn/ওয়েব',
+    lbl_obj:'Objective',lbl_lang:'ভাষা দক্ষতা',lbl_awd:'সম্মাননা',lbl_vol:'স্বেচ্ছাসেবী',lbl_hob:'শখ',
+    add_edu:'নতুন শিক্ষা যোগ',add_exp:'নতুন অভিজ্ঞতা',add_skill:'নতুন দক্ষতা',add_course:'নতুন কোর্স',add_ref:'রেফারেন্স যোগ',
+    cv_pers:'ব্যক্তিগত তথ্য',cv_obj:'উদ্দেশ্য',cv_edu:'শিক্ষাগত যোগ্যতা',cv_exp:'কর্ম অভিজ্ঞতা',
+    cv_skill:'দক্ষতা',cv_lang:'ভাষা',cv_hob:'শখ',cv_course:'কোর্স/সনদ',cv_awd:'সম্মাননা',cv_vol:'স্বেচ্ছাসেবী',cv_ref:'রেফারেন্স',
+    cv_dob:'জন্ম তারিখ',cv_nat:'জাতীয়তা',cv_rel:'ধর্ম',cv_mar:'বৈবাহিক',cv_nid:'NID',
+    cv_goal:'পেশাদার লক্ষ্য',cv_prof:'পেশাদার সারসংক্ষেপ',cv_cert:'সার্টিফিকেশন',
+    cv_ri:'গবেষণা আগ্রহ',cv_ae:'একাডেমিক অভিজ্ঞতা',cv_rs:'গবেষণা দক্ষতা',
+    cv_pub:'প্রকাশনা',cv_fel:'পুরস্কার ও ফেলোশিপ',cv_ps:'প্রোফাইল সারসংক্ষেপ',
+    cv_ms:'মূল দক্ষতা',cv_tr:'প্রশিক্ষণ',cv_bio:'জীবনবৃত্তান্ত',cv_photo:'ছবি\n৩×৪ সেমি',
+    cv_from:'হতে',cv_sign:'স্বাক্ষর',cv_board:'বোর্ড',cv_dur:'কর্মকাল',cv_slevel:'মাত্রা',
+    lbl_edu:'শিক্ষা',lbl_exp:'অভিজ্ঞতা',lbl_sk:'দক্ষতা',lbl_cr:'কোর্স',lbl_rf:'রেফারেন্স',
+    lbl_deg:'ডিগ্রি',lbl_inst:'প্রতিষ্ঠান',lbl_yr:'সাল',lbl_res:'ফলাফল',lbl_brd:'বোর্ড',
+    lbl_pos:'পদবী',lbl_comp:'প্রতিষ্ঠান',lbl_from:'যোগদান',lbl_to:'ছাড়ার তারিখ',lbl_desc:'বিবরণ',
+    lbl_sn:'দক্ষতার নাম',lbl_sl:'মাত্রা',lbl_cn:'কোর্স',lbl_co:'প্রতিষ্ঠান',lbl_cy:'বছর',
+    lbl_rn:'নাম',lbl_rt:'পদবী',lbl_rp:'ফোন',lbl_re:'ইমেইল',remove:'মুছুন'
+  },
+  en:{
+    t_classic:'Classic',t_modern:'Modern',t_govt:'Government',t_ngo:'NGO',t_tech:'Tech/IT',t_academic:'Academic',
+    tab_p:'Personal Info',tab_e:'Education',tab_x:'Work Experience',tab_s:'Skills & Courses',tab_o:'Other Info',
+    sh_p:'Personal Information',sh_e:'Education',sh_x:'Work Experience',sh_s:'Skills & Courses',sh_c:'Training / Courses',sh_o:'Other Information',sh_r:'References',
+    photo_title:'Upload Photo',photo_desc:'JPG/PNG, Max 5 MB',photo_btn:'Select Photo',rm_btn:'Remove',
+    lbl_bn:'Full Name (Bengali)',lbl_en:'Full Name (English)',lbl_ttl:'Designation',lbl_ph:'Mobile',
+    lbl_em:'Email',lbl_addr:'Address',lbl_dob:'Date of Birth',lbl_nat:'Nationality',
+    lbl_rel:'Religion',lbl_mar:'Marital Status',lbl_nid:'NID',lbl_web:'LinkedIn/Website',
+    lbl_obj:'Objective',lbl_lang:'Languages',lbl_awd:'Awards',lbl_vol:'Volunteer',lbl_hob:'Hobbies',
+    add_edu:'Add Education',add_exp:'Add Experience',add_skill:'Add Skill',add_course:'Add Course',add_ref:'Add Reference',
+    cv_pers:'Personal Information',cv_obj:'Objective',cv_edu:'Education',cv_exp:'Work Experience',
+    cv_skill:'Skills',cv_lang:'Languages',cv_hob:'Hobbies',cv_course:'Courses',cv_awd:'Awards',cv_vol:'Volunteer',cv_ref:'References',
+    cv_dob:'Date of Birth',cv_nat:'Nationality',cv_rel:'Religion',cv_mar:'Marital',cv_nid:'NID',
+    cv_goal:'Professional Goal',cv_prof:'Professional Summary',cv_cert:'Certifications',
+    cv_ri:'Research Interests',cv_ae:'Academic Experience',cv_rs:'Research Skills',
+    cv_pub:'Publications',cv_fel:'Awards & Fellowships',cv_ps:'Profile Summary',
+    cv_ms:'Core Skills',cv_tr:'Training',cv_bio:'Curriculum Vitae',cv_photo:'Photo\n3×4 cm',
+    cv_from:'to',cv_sign:'Signature',cv_board:'Board',cv_dur:'Duration',cv_slevel:'Level',
+    lbl_edu:'Education',lbl_exp:'Experience',lbl_sk:'Skill',lbl_cr:'Course',lbl_rf:'Reference',
+    lbl_deg:'Degree',lbl_inst:'Institution',lbl_yr:'Year',lbl_res:'Result',lbl_brd:'Board',
+    lbl_pos:'Position',lbl_comp:'Organization',lbl_from:'Joining',lbl_to:'Leaving',lbl_desc:'Description',
+    lbl_sn:'Skill Name',lbl_sl:'Level',lbl_cn:'Course Name',lbl_co:'Institution',lbl_cy:'Year',
+    lbl_rn:'Name',lbl_rt:'Designation',lbl_rp:'Phone',lbl_re:'Email',remove:'Remove'
+  }
+};
+function t(k) { return T[lang][k] || T.bn[k] || k; }
+function mval(raw) { if(!raw) return ''; const p=raw.split('|'); return lang==='en'?(p[1]||p[0]):p[0]; }
+
+// ========== LANG ==========
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-bn').classList.toggle('active',l==='bn');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  applyLabels(); renderCV();
+}
+function applyLabels() {
+  const m = {
+    't-classic':'t_classic','t-modern':'t_modern','t-govt':'t_govt','t-ngo':'t_ngo','t-tech':'t_tech','t-academic':'t_academic',
+    'tab-p':'tab_p','tab-e':'tab_e','tab-x':'tab_x','tab-s':'tab_s','tab-o':'tab_o',
+    'sh-p':'sh_p','sh-e':'sh_e','sh-x':'sh_x','sh-s':'sh_s','sh-c':'sh_c','sh-o':'sh_o','sh-r':'sh_r',
+    'photo-title':'photo_title','photo-desc':'photo_desc','photo-btn':'photo_btn','rm-btn':'rm_btn',
+    'lbl-bn':'lbl_bn','lbl-en':'lbl_en','lbl-ttl':'lbl_ttl','lbl-ph':'lbl_ph','lbl-em':'lbl_em',
+    'lbl-addr':'lbl_addr','lbl-dob':'lbl_dob','lbl-nat':'lbl_nat','lbl-rel':'lbl_rel','lbl-mar':'lbl_mar',
+    'lbl-nid':'lbl_nid','lbl-web':'lbl_web','lbl-obj':'lbl_obj','lbl-lang':'lbl_lang','lbl-awd':'lbl_awd',
+    'lbl-vol':'lbl_vol','lbl-hob':'lbl_hob','add-edu':'add_edu','add-exp':'add_exp',
+    'add-skill':'add_skill','add-course':'add_course','add-ref':'add_ref'
+  };
+  for(const [id,k] of Object.entries(m)) { const el=document.getElementById(id); if(el) el.textContent=t(k); }
+  renderEduList(); renderExpList(); renderSkillList(); renderCourseList(); renderRefList();
 }
 
-async function deductCoins(uid, curCoins) {
-  const c = prompt(`কত কয়েন কাটতে চান? (বর্তমান: ${curCoins})`);
-  if(!c||isNaN(c)) return;
-  const newC = Math.max(0, curCoins-parseInt(c));
-  showLoading(true);
-  const {db, doc, updateDoc} = window._fb;
-  try {
-    await updateDoc(doc(db,'users',uid),{coins: newC});
-    showToast(`✅ কয়েন কাটা হয়েছে। নতুন ব্যালেন্স: ${newC}`,'info');
-    await loadUsers();
-  } catch(e) { showToast('ত্রুটি','error'); }
-  showLoading(false);
+// ========== PHOTO ==========
+function handlePhoto(e) {
+  const f=e.target.files[0]; if(!f) return;
+  if(f.size>5*1024*1024){showToast('সর্বোচ্চ ৫ MB','error'); return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    photo=ev.target.result;
+    document.getElementById('photo-preview').innerHTML=`<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById('btn-rm').style.display='flex';
+    renderCV();
+  };
+  r.readAsDataURL(f);
+}
+function removePhoto() {
+  photo=null;
+  document.getElementById('photo-preview').innerHTML='<span class="up-icon">📷</span>';
+  document.getElementById('btn-rm').style.display='none';
+  document.getElementById('photo-file').value='';
+  renderCV();
 }
 
-async function addVPDirect() {
-  const trxId = document.getElementById('new-vp-trx').value.trim();
-  const amount = parseInt(document.getElementById('new-vp-amt').value);
-  if(!trxId||!amount) { showToast('Trx ID ও পরিমাণ দিন','error'); return; }
-  showLoading(true);
-  const {db, collection, addDoc, serverTimestamp} = window._fb;
-  try {
-    await addDoc(collection(db,'verified_payments'),{trxId, amount, status:'unused', createdAt:serverTimestamp()});
-    document.getElementById('new-vp-trx').value='';
-    document.getElementById('new-vp-amt').value='';
-    showToast('✅ Verified Payment যোগ হয়েছে','success');
-    await loadVerifiedPayments();
-  } catch(e) { showToast('ত্রুটি','error'); }
-  showLoading(false);
-}
-
-// ========== SETTINGS ==========
-async function saveDownloadCost() {
-  const cost = parseInt(document.getElementById('s-dl-cost').value);
-  if(!cost) { showToast('সঠিক মান দিন','error'); return; }
-  await saveSetting('downloadCost', cost);
-  showToast('✅ ডাউনলোড খরচ সেভ হয়েছে','success');
-}
-
-async function savePaymentSettings() {
-  const bkash = document.getElementById('s-bkash').value.trim();
-  const nagad = document.getElementById('s-nagad').value.trim();
-  const payType = document.getElementById('s-paytype').value;
-  if(!bkash||!nagad) { showToast('নম্বর দিন','error'); return; }
-  const {db, doc, setDoc, getDoc} = window._fb;
-  try {
-    const ref = doc(db,'settings','main');
-    const snap = await getDoc(ref);
-    const cur = snap.exists()?snap.data():{};
-    await setDoc(ref,{...cur, bkash, nagad, paymentType:payType});
-    showToast('✅ পেমেন্ট সেটিংস সেভ হয়েছে','success');
-  } catch(e) { showToast('ত্রুটি','error'); }
-}
-
-async function saveSetting(key, val) {
-  const {db, doc, setDoc, getDoc} = window._fb;
-  const ref = doc(db,'settings','main');
-  const snap = await getDoc(ref);
-  const cur = snap.exists()?snap.data():{};
-  await setDoc(ref,{...cur,[key]:val});
-}
-
-// ========== PACKAGES ==========
-function renderPackageEditor() {
-  document.getElementById('pkg-editor').innerHTML = packages.map((p,i)=>`
-    <div class="pkg-row" id="pkg-row-${i}">
-      <input type="number" value="${p.coins}" placeholder="কয়েন" oninput="packages[${i}].coins=+this.value;updatePkgPreview()">
-      <input type="number" value="${p.price}" placeholder="মূল্য (TK)" oninput="packages[${i}].price=+this.value;updatePkgPreview()">
-      <input type="text" value="${p.label||''}" placeholder="লেবেল" oninput="packages[${i}].label=this.value;updatePkgPreview()">
-      <button class="btn-rm-pkg" onclick="removePkgRow(${i})">✕</button>
-    </div>`).join('');
-  updatePkgPreview();
-}
-
-function addPkgRow() {
-  packages.push({coins:100,price:99,label:''});
-  renderPackageEditor();
-}
-
-function removePkgRow(i) {
-  if(packages.length<=1){showToast('কমপক্ষে ১টি প্যাকেজ রাখুন','error');return;}
-  packages.splice(i,1);
-  renderPackageEditor();
-}
-
-function updatePkgPreview() {
-  document.getElementById('pkg-preview').innerHTML = packages.map(p=>`
-    <div style="border:2px solid var(--border);border-radius:10px;padding:12px;text-align:center;background:var(--surface2)">
-      ${p.label?`<div style="font-size:0.65rem;background:var(--red);color:white;padding:2px 6px;border-radius:10px;margin-bottom:6px;display:inline-block">${p.label}</div>`:'<div style="height:18px;margin-bottom:6px"></div>'}
-      <div style="font-size:1.2rem;font-weight:700;color:var(--gold)">🪙 ${p.coins}</div>
-      <div style="font-size:0.88rem;font-weight:700;color:#4ade80">${p.price} ৳</div>
-    </div>`).join('');
-}
-
-async function savePackages() {
-  showLoading(true);
-  try {
-    await saveSetting('packages', packages);
-    showToast('✅ প্যাকেজ সেভ হয়েছে','success');
-  } catch(e) { showToast('ত্রুটি','error'); }
-  showLoading(false);
-}
-
-// ========== FILTER ==========
-function filterPayments() {
-  const q = document.getElementById('pay-search').value.toLowerCase();
-  const f = document.getElementById('pay-filter').value;
-  let res = allPayments;
-  if(f) res = res.filter(p=>p.status===f);
-  if(q) res = res.filter(p=>(p.userName||'').toLowerCase().includes(q)||(p.trxId||'').toLowerCase().includes(q)||(p.userEmail||'').toLowerCase().includes(q));
-  renderPayments(res);
-}
-
-function filterUsers() {
-  const q = document.getElementById('user-search').value.toLowerCase();
-  let res = allUsers;
-  if(q) res = res.filter(u=>(u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q));
-  renderUsers(res);
-}
-
-// ========== UI ==========
-function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
+// ========== SECTION / TEMPLATE ==========
+function switchSection(sec,btn) {
+  document.querySelectorAll('.editor-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sec-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+sec).classList.add('active');
   if(btn) btn.classList.add('active');
-  if(name==='packages') renderPackageEditor();
+}
+function switchTemplate(name,card) {
+  tpl=name;
+  document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
+  if(card) card.classList.add('active');
+  renderCV();
 }
 
+// ========== SYNC ==========
+function sync() {
+  ['nameBn','nameEn','title','phone','email','address','dob','nationality','religion','marital','nid','website','objective','languages','awards','volunteer','hobbies'].forEach(id=>{
+    const el=document.getElementById(id); if(el) d[id]=el.value;
+  });
+  renderCV();
+}
+
+// ========== HELPERS ==========
+function initials() { return((d.nameEn||d.nameBn||'R').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)); }
+function dname() { return lang==='en'?(d.nameEn||d.nameBn):(d.nameBn||d.nameEn); }
+const gc=(color)=>`color:${color};border-bottom-color:${color}`;
+
+const infoRows=(color)=>`
+  ${d.dob?`<div class="info-row"><span class="info-label">${t('cv_dob')}</span><span>${d.dob}</span></div>`:''}
+  ${d.nationality?`<div class="info-row"><span class="info-label">${t('cv_nat')}</span><span>${d.nationality}</span></div>`:''}
+  ${d.religion?`<div class="info-row"><span class="info-label">${t('cv_rel')}</span><span>${d.religion}</span></div>`:''}
+  ${mval(d.marital)?`<div class="info-row"><span class="info-label">${t('cv_mar')}</span><span>${mval(d.marital)}</span></div>`:''}
+  ${d.nid?`<div class="info-row"><span class="info-label">${t('cv_nid')}</span><span>${d.nid}</span></div>`:''}`;
+
+const skillBars=(color)=>skills.map(s=>`<div class="skill-bar"><div class="skill-name-lbl">${s.name}</div><div class="skill-track"><div class="skill-fill" style="width:${s.level}%;background:${color}"></div></div></div>`).join('');
+
+// ========== RENDER CV ==========
+function renderCV() {
+  const el=document.getElementById('cv-preview');
+  if(!el) return;
+  const nm=dname();
+  const ini=initials();
+  const mar=mval(d.marital);
+  let html='';
+
+  /* CLASSIC */
+  if(tpl==='classic') {
+    const pimg=photo?`<img src="${photo}" style="width:75px;height:92px;object-fit:cover;border-radius:5px;border:3px solid rgba(255,255,255,0.5);float:right;margin-left:12px;" alt="photo">`:'';
+    html=`<div class="cv-classic">
+      <div class="cv-header">${pimg}
+        <div style="font-family:'Noto Serif Bengali',serif;font-size:1.55rem;font-weight:700">${nm}</div>
+        <div style="font-size:0.88rem;opacity:0.85;margin-top:2px">${d.title}</div>
+        <div style="display:flex;gap:12px;margin-top:7px;font-size:0.75rem;flex-wrap:wrap;opacity:0.9">
+          ${d.phone?`📞 ${d.phone}`:''} ${d.email?`| ✉️ ${d.email}`:''} ${d.address?`| 📍 ${d.address}`:''}
+        </div>
+      </div>
+      <div class="cv-body">
+        <div class="cv-left">
+          <div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_pers')}</div>${infoRows('#1a237e')}</div>
+          ${skills.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_skill')}</div>${skillBars('#1a237e')}</div>`:''}
+          ${d.languages?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_lang')}</div><p style="font-size:0.76rem;color:#444">${d.languages}</p></div>`:''}
+          ${courses.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_course')}</div>${courses.map(c=>`<div style="margin-bottom:6px"><div class="cv-item-name">${c.name}</div><div class="cv-item-sub">${c.org}</div><div class="cv-item-date">${c.year}</div></div>`).join('')}</div>`:''}
+          ${d.hobbies?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_hob')}</div><p style="font-size:0.76rem;color:#444">${d.hobbies}</p></div>`:''}
+        </div>
+        <div class="cv-right">
+          ${d.objective?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_obj')}</div><p class="cv-item-desc">${d.objective}</p></div>`:''}
+          ${edus.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_edu')}</div>${edus.map(e=>`<div style="margin-bottom:9px"><div class="cv-item-name">${e.degree}</div><div class="cv-item-sub">${e.institute}${e.board?' — '+e.board:''}</div><div class="cv-item-date">${e.year} | ${e.result}</div></div>`).join('')}</div>`:''}
+          ${exps.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_exp')}</div>${exps.map(e=>`<div style="margin-bottom:11px"><div class="cv-item-name">${e.position}</div><div class="cv-item-sub">${e.company}</div><div class="cv-item-date">${e.from} — ${e.to}</div><div class="cv-item-desc">${e.desc}</div></div>`).join('')}</div>`:''}
+          ${d.awards?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_awd')}</div><p class="cv-item-desc" style="white-space:pre-line">${d.awards}</p></div>`:''}
+          ${refs.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1a237e')}">${t('cv_ref')}</div>${refs.map(r=>`<div style="margin-bottom:8px"><div class="cv-item-name">${r.name}</div><div class="cv-item-sub">${r.title}</div><div class="cv-item-date">📞 ${r.phone} | ✉️ ${r.email}</div></div>`).join('')}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  /* MODERN */
+  else if(tpl==='modern') {
+    const avt=photo?`<img src="${photo}" style="width:75px;height:92px;object-fit:cover;border-radius:7px;border:3px solid rgba(255,255,255,0.5);" alt="photo">`
+    :`<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;border:3px solid rgba(255,255,255,0.4)">${ini}</div>`;
+    html=`<div class="cv-modern">
+      <div class="cv-header">${avt}
+        <div>
+          <div style="font-family:'Noto Serif Bengali',serif;font-size:1.45rem;font-weight:700">${nm}</div>
+          <div style="font-size:0.88rem;opacity:0.85;margin-top:2px">${d.title}</div>
+          <div style="font-size:0.75rem;opacity:0.9;margin-top:6px">${[d.phone,d.email,d.address].filter(Boolean).join(' • ')}</div>
+          ${d.website?`<div style="font-size:0.74rem;opacity:0.85;margin-top:2px">🔗 ${d.website}</div>`:''}
+        </div>
+      </div>
+      <div class="cv-body">
+        <div class="cv-left">
+          <div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_pers')}</div>${infoRows('var(--green)')}</div>
+          ${skills.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_skill')}</div>${skillBars('var(--green)')}</div>`:''}
+          ${d.languages?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_lang')}</div><p style="font-size:0.76rem;color:#444">${d.languages}</p></div>`:''}
+          ${d.hobbies?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_hob')}</div><p style="font-size:0.76rem;color:#444">${d.hobbies}</p></div>`:''}
+        </div>
+        <div class="cv-right">
+          ${d.objective?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_goal')}</div><p class="cv-item-desc">${d.objective}</p></div>`:''}
+          ${edus.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_edu')}</div>${edus.map(e=>`<div style="margin-bottom:10px;padding-left:9px;border-left:3px solid var(--green)"><div class="cv-item-name">${e.degree}</div><div class="cv-item-sub">${e.institute}</div><div class="cv-item-date">${e.year} • ${e.result}</div></div>`).join('')}</div>`:''}
+          ${exps.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_exp')}</div>${exps.map(e=>`<div style="margin-bottom:11px;padding-left:9px;border-left:3px solid var(--green)"><div class="cv-item-name">${e.position}</div><div class="cv-item-sub">${e.company}</div><div class="cv-item-date">${e.from} — ${e.to}</div><div class="cv-item-desc">${e.desc}</div></div>`).join('')}</div>`:''}
+          ${courses.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_course')}</div>${courses.map(c=>`<div style="margin-bottom:6px"><div class="cv-item-name">${c.name}</div><div class="cv-item-sub">${c.org} — ${c.year}</div></div>`).join('')}</div>`:''}
+          ${d.awards?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_awd')}</div><p class="cv-item-desc" style="white-space:pre-line">${d.awards}</p></div>`:''}
+          ${refs.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('var(--green)')}">${t('cv_ref')}</div>${refs.map(r=>`<div style="margin-bottom:8px"><div class="cv-item-name">${r.name}</div><div class="cv-item-sub">${r.title}</div><div class="cv-item-date">📞 ${r.phone} • ✉️ ${r.email}</div></div>`).join('')}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  /* GOVT */
+  else if(tpl==='govt') {
+    const gpimg=photo?`<img src="${photo}" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:65px;height:80px;object-fit:cover;border:1px solid #ccc;border-radius:2px;" alt="photo">`
+    :`<div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:65px;height:80px;border:1px solid #ccc;background:#f9f0f0;display:flex;align-items:center;justify-content:center;font-size:0.58rem;color:#aaa;text-align:center">ছবি<br>৩×৪</div>`;
+    html=`<div class="cv-govt-wrap" style="font-family:'Hind Siliguri',sans-serif">
+      <div style="margin:18px;border:2px solid #B71C1C;padding:16px 82px 16px 18px;text-align:center;position:relative;">${gpimg}
+        <div style="font-family:'Noto Serif Bengali',serif;font-size:0.9rem;font-weight:700;color:#B71C1C">${t('cv_bio')}</div>
+        <div style="font-family:'Noto Serif Bengali',serif;font-size:1.25rem;font-weight:700;color:#222;margin:5px 0">${nm}</div>
+        <div style="font-size:0.82rem;color:#555">${d.title}</div>
+      </div>
+      <div style="padding:0 20px 20px">
+        <div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#B71C1C')}">${t('cv_pers')}</div>
+          <table class="cv-govt-wrap" style="width:100%;border-collapse:collapse;font-size:0.78rem;margin-bottom:12px">
+            ${d.nameBn?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5;width:36%">${t('lbl_bn')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.nameBn}</td></tr>`:''}
+            ${d.nameEn?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">Full Name</td><td style="padding:5px 8px;border:1px solid #ddd">${d.nameEn}</td></tr>`:''}
+            ${d.dob?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('cv_dob')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.dob}</td></tr>`:''}
+            ${d.nationality?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('cv_nat')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.nationality}</td></tr>`:''}
+            ${d.religion?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('cv_rel')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.religion}</td></tr>`:''}
+            ${mar?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('cv_mar')}</td><td style="padding:5px 8px;border:1px solid #ddd">${mar}</td></tr>`:''}
+            ${d.nid?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('cv_nid')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.nid}</td></tr>`:''}
+            ${d.phone?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('lbl_ph')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.phone}</td></tr>`:''}
+            ${d.email?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('lbl_em')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.email}</td></tr>`:''}
+            ${d.address?`<tr><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;background:#fef5f5">${t('lbl_addr')}</td><td style="padding:5px 8px;border:1px solid #ddd">${d.address}</td></tr>`:''}
+          </table>
+        </div>
+        ${edus.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#B71C1C')}">${t('cv_edu')}</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.76rem"><tr style="background:#fef5f5;font-weight:600"><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_deg')}</td><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_inst')}</td><td style="padding:5px 7px;border:1px solid #ddd">${t('cv_board')}</td><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_yr')}</td><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_res')}</td></tr>
+          ${edus.map(e=>`<tr><td style="padding:5px 7px;border:1px solid #ddd">${e.degree}</td><td style="padding:5px 7px;border:1px solid #ddd">${e.institute}</td><td style="padding:5px 7px;border:1px solid #ddd">${e.board||'-'}</td><td style="padding:5px 7px;border:1px solid #ddd">${e.year}</td><td style="padding:5px 7px;border:1px solid #ddd">${e.result}</td></tr>`).join('')}</table></div>`:''}
+        ${exps.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#B71C1C')}">${t('cv_exp')}</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.76rem"><tr style="background:#fef5f5;font-weight:600"><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_pos')}</td><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_comp')}</td><td style="padding:5px 7px;border:1px solid #ddd">${t('cv_dur')}</td></tr>
+          ${exps.map(e=>`<tr><td style="padding:5px 7px;border:1px solid #ddd">${e.position}</td><td style="padding:5px 7px;border:1px solid #ddd">${e.company}</td><td style="padding:5px 7px;border:1px solid #ddd">${e.from} ${t('cv_from')} ${e.to}</td></tr>`).join('')}</table></div>`:''}
+        ${d.languages?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#B71C1C')}">${t('cv_lang')}</div><p style="font-size:0.8rem">${d.languages}</p></div>`:''}
+        ${refs.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#B71C1C')}">${t('cv_ref')}</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.76rem"><tr style="background:#fef5f5;font-weight:600"><td style="padding:5px 7px;border:1px solid #ddd">নাম ও পদবী</td><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_rp')}</td><td style="padding:5px 7px;border:1px solid #ddd">${t('lbl_re')}</td></tr>
+          ${refs.map(r=>`<tr><td style="padding:5px 7px;border:1px solid #ddd">${r.name}<br><small>${r.title}</small></td><td style="padding:5px 7px;border:1px solid #ddd">${r.phone}</td><td style="padding:5px 7px;border:1px solid #ddd">${r.email}</td></tr>`).join('')}</table></div>`:''}
+        <div style="margin-top:36px;display:flex;justify-content:flex-end">
+          <div style="text-align:center"><div style="width:140px;border-top:1px solid #333;padding-top:7px;font-size:0.76rem">${t('cv_sign')}</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  /* NGO */
+  else if(tpl==='ngo') {
+    const navt=photo?`<img src="${photo}" style="width:75px;height:92px;object-fit:cover;border-radius:7px;border:3px solid rgba(255,255,255,0.4);flex-shrink:0;" alt="photo">`
+    :`<div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;border:3px solid rgba(255,255,255,0.3);flex-shrink:0">${ini}</div>`;
+    html=`<div class="cv-ngo">
+      <div class="cv-header">${navt}
+        <div>
+          <div style="font-family:'Noto Serif Bengali',serif;font-size:1.5rem;font-weight:700">${nm}</div>
+          <div style="opacity:0.85;font-size:0.88rem;margin-top:2px">${d.title}</div>
+          <div style="font-size:0.78rem;margin-top:6px;opacity:0.9">${[d.phone,d.email,d.address].filter(Boolean).join(' | ')}</div>
+        </div>
+      </div>
+      <div class="accent-bar"></div>
+      <div class="cv-body">
+        ${d.objective?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_ps')}</div><p class="cv-item-desc">${d.objective}</p></div>`:''}
+        <div class="two-col">
+          <div>
+            ${edus.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_edu')}</div>${edus.map(e=>`<div style="margin-bottom:9px"><div class="cv-item-name">${e.degree}</div><div class="cv-item-sub">${e.institute}</div><div class="cv-item-date">${e.year} | ${e.result}</div></div>`).join('')}</div>`:''}
+            ${skills.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_ms')}</div>${skillBars('#4527A0')}</div>`:''}
+          </div>
+          <div>
+            ${exps.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_exp')}</div>${exps.map(e=>`<div style="margin-bottom:11px"><div class="cv-item-name">${e.position}</div><div class="cv-item-sub">${e.company}</div><div class="cv-item-date">${e.from} — ${e.to}</div><div class="cv-item-desc">${e.desc}</div></div>`).join('')}</div>`:''}
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            ${d.volunteer?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_vol')}</div><p class="cv-item-desc" style="white-space:pre-line">${d.volunteer}</p></div>`:''}
+            ${d.languages?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_lang')}</div><p class="cv-item-desc">${d.languages}</p></div>`:''}
+          </div>
+          <div>
+            ${courses.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_tr')}</div>${courses.map(c=>`<div style="margin-bottom:6px"><div class="cv-item-name">${c.name}</div><div class="cv-item-sub">${c.org} (${c.year})</div></div>`).join('')}</div>`:''}
+            ${d.awards?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_awd')}</div><p class="cv-item-desc" style="white-space:pre-line">${d.awards}</p></div>`:''}
+          </div>
+        </div>
+        ${refs.length?`<div class="cv-sec-block" style="border-top:1px solid #eee;padding-top:12px"><div class="cv-sec-title" style="${gc('#4527A0')}">${t('cv_ref')}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${refs.map(r=>`<div style="background:#f5f0ff;padding:10px;border-radius:7px"><div class="cv-item-name">${r.name}</div><div class="cv-item-sub">${r.title}</div><div class="cv-item-date">📞 ${r.phone}</div><div class="cv-item-date">✉️ ${r.email}</div></div>`).join('')}</div>
+        </div>`:''}
+      </div>
+    </div>`;
+  }
+
+  /* TECH */
+  else if(tpl==='tech') {
+    const tpimg=photo?`<img src="${photo}" style="width:62px;height:76px;object-fit:cover;border-radius:5px;border:2px solid rgba(255,255,255,0.4);margin-bottom:12px;display:block;" alt="photo">`
+    :`<div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:white;margin-bottom:12px;border:2px solid rgba(255,255,255,0.4)">${ini}</div>`;
+    html=`<div class="cv-tech-wrap">
+      <div class="cv-sidebar">
+        ${tpimg}
+        <div style="font-family:'Noto Serif Bengali',serif;font-size:1rem;font-weight:700;color:white;margin-bottom:2px">${d.nameEn||d.nameBn}</div>
+        <div style="font-size:0.74rem;opacity:0.75;margin-bottom:14px;color:rgba(255,255,255,0.8)">${d.title}</div>
+        ${d.phone?`<div style="color:rgba(255,255,255,0.85);font-size:0.72rem;margin-bottom:3px">📞 ${d.phone}</div>`:''}
+        ${d.email?`<div style="color:rgba(255,255,255,0.85);font-size:0.72rem;margin-bottom:3px">✉️ ${d.email}</div>`:''}
+        ${d.address?`<div style="color:rgba(255,255,255,0.85);font-size:0.72rem;margin-bottom:3px">📍 ${d.address}</div>`:''}
+        ${d.website?`<div style="color:rgba(255,255,255,0.85);font-size:0.72rem;margin-bottom:12px">🔗 ${d.website}</div>`:''}
+        ${(d.dob||d.nationality)?`<div style="margin-top:12px"><div class="cv-sec-title" style="color:#90caf9;border-bottom-color:#1565c0">${t('cv_pers')}</div>
+          ${d.dob?`<div style="font-size:0.7rem;color:rgba(255,255,255,0.8);margin-bottom:2px">${t('cv_dob')}: ${d.dob}</div>`:''}
+          ${d.nationality?`<div style="font-size:0.7rem;color:rgba(255,255,255,0.8);margin-bottom:2px">${t('cv_nat')}: ${d.nationality}</div>`:''}
+          ${mar?`<div style="font-size:0.7rem;color:rgba(255,255,255,0.8);margin-bottom:2px">${t('cv_mar')}: ${mar}</div>`:''}
+        </div>`:''}
+        ${skills.length?`<div style="margin-top:14px"><div class="cv-sec-title" style="color:#90caf9;border-bottom-color:#1565c0">${t('cv_skill')}</div>
+          ${skills.map(s=>`<div style="margin-bottom:6px"><div style="font-size:0.7rem;color:white;margin-bottom:2px">${s.name}</div><div style="background:rgba(255,255,255,0.15);border-radius:3px;height:3px"><div style="background:#90caf9;height:3px;border-radius:3px;width:${s.level}%"></div></div></div>`).join('')}</div>`:''}
+        ${d.languages?`<div style="margin-top:12px"><div class="cv-sec-title" style="color:#90caf9;border-bottom-color:#1565c0">${t('cv_lang')}</div><p style="font-size:0.7rem;color:rgba(255,255,255,0.82)">${d.languages}</p></div>`:''}
+      </div>
+      <div class="cv-main">
+        ${d.objective?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#0d47a1')}">${t('cv_prof')}</div><p class="cv-item-desc">${d.objective}</p></div>`:''}
+        ${exps.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#0d47a1')}">${t('cv_exp')}</div>${exps.map(e=>`<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between"><div><div class="cv-item-name">${e.position}</div><div class="cv-item-sub">${e.company}</div></div><div style="font-size:0.7rem;color:#888;white-space:nowrap">${e.from}–${e.to}</div></div><div class="cv-item-desc">${e.desc}</div></div>`).join('')}</div>`:''}
+        ${edus.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#0d47a1')}">${t('cv_edu')}</div>${edus.map(e=>`<div style="margin-bottom:8px;display:flex;justify-content:space-between"><div><div class="cv-item-name">${e.degree}</div><div class="cv-item-sub">${e.institute}</div><div class="cv-item-date">${e.result}</div></div><div style="font-size:0.7rem;color:#888">${e.year}</div></div>`).join('')}</div>`:''}
+        ${courses.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#0d47a1')}">${t('cv_cert')}</div><div>${courses.map(c=>`<span style="display:inline-block;background:#e3f2fd;color:#0d47a1;padding:3px 9px;border-radius:20px;font-size:0.72rem;margin:2px;font-weight:500">✅ ${c.name}</span>`).join('')}</div></div>`:''}
+        ${d.awards?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#0d47a1')}">${t('cv_awd')}</div><p class="cv-item-desc" style="white-space:pre-line">${d.awards}</p></div>`:''}
+        ${refs.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#0d47a1')}">${t('cv_ref')}</div>${refs.map(r=>`<div style="margin-bottom:8px"><div class="cv-item-name">${r.name}</div><div class="cv-item-sub">${r.title}</div><div class="cv-item-date">📞 ${r.phone} • ✉️ ${r.email}</div></div>`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  }
+
+  /* ACADEMIC */
+  else if(tpl==='academic') {
+    const acpimg=photo?`<img src="${photo}" style="width:74px;height:90px;object-fit:cover;border-radius:4px;border:2px solid #1B5E20;flex-shrink:0;" alt="photo">`
+    :`<div style="width:74px;height:90px;border-radius:4px;border:2px solid #1B5E20;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#1B5E20;background:#e8f5e9;flex-shrink:0">${ini}</div>`;
+    html=`<div class="cv-academic">
+      <div style="display:flex;align-items:center;gap:18px;border-bottom:3px double #1B5E20;padding-bottom:15px;margin-bottom:15px">
+        ${acpimg}
+        <div style="flex:1;text-align:center">
+          <div style="font-family:'Noto Serif Bengali',serif;font-size:1.65rem;font-weight:700;color:#1B5E20">${nm}</div>
+          <div style="color:#555;margin-top:3px;font-size:0.85rem">${d.title}</div>
+          <div style="margin-top:6px;font-size:0.76rem;color:#666">${[d.phone,d.email,d.address,d.website].filter(Boolean).join(' | ')}</div>
+        </div>
+      </div>
+      ${d.objective?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_ri')}</div><p class="cv-item-desc">${d.objective}</p></div>`:''}
+      ${edus.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_edu')}</div>${edus.map(e=>`<div style="display:flex;justify-content:space-between;margin-bottom:9px;padding-bottom:7px;border-bottom:0.5px solid #eee"><div><div class="cv-item-name">${e.degree}</div><div class="cv-item-sub">${e.institute}</div><div class="cv-item-date">${e.result}</div></div><div style="font-size:0.76rem;color:#888">${e.year}</div></div>`).join('')}</div>`:''}
+      ${exps.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_ae')}</div>${exps.map(e=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between"><div class="cv-item-name">${e.position}, ${e.company}</div><div style="font-size:0.73rem;color:#888">${e.from}–${e.to}</div></div><div class="cv-item-desc">${e.desc}</div></div>`).join('')}</div>`:''}
+      ${skills.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_rs')}</div><div>${skills.map(s=>`<span style="display:inline-block;border:1px solid #1B5E20;color:#1B5E20;padding:3px 11px;border-radius:20px;font-size:0.72rem;margin:2px">${s.name}</span>`).join('')}</div></div>`:''}
+      ${courses.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_pub')}</div>${courses.map(c=>`<div style="margin-bottom:8px;font-size:0.8rem"><em style="font-weight:600">${c.name}</em> — ${c.org}, ${c.year}</div>`).join('')}</div>`:''}
+      ${d.awards?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_fel')}</div><p class="cv-item-desc" style="white-space:pre-line">${d.awards}</p></div>`:''}
+      ${d.languages?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_lang')}</div><p class="cv-item-desc">${d.languages}</p></div>`:''}
+      ${refs.length?`<div class="cv-sec-block"><div class="cv-sec-title" style="${gc('#1B5E20')}">${t('cv_ref')}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">${refs.map(r=>`<div><div class="cv-item-name">${r.name}</div><div class="cv-item-sub">${r.title}</div><div class="cv-item-date">${r.phone} | ${r.email}</div></div>`).join('')}</div></div>`:''}
+    </div>`;
+  }
+
+  el.innerHTML=html;
+}
+
+// ========== LISTS ==========
+function addEdu(){edus.push({degree:'',institute:'',year:'',result:'',board:''}); renderEduList(); renderCV();}
+function removeEdu(i){edus.splice(i,1); renderEduList(); renderCV();}
+function renderEduList(){
+  document.getElementById('edu-list').innerHTML=edus.map((e,i)=>`
+    <div class="repeat-item">
+      <div class="repeat-item-header"><span class="repeat-item-title">${t('lbl_edu')} ${i+1}</span><button class="btn-remove" onclick="removeEdu(${i})">✕ ${t('remove')}</button></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_deg')}</label><input value="${e.degree}" oninput="edus[${i}].degree=this.value;renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_inst')}</label><input value="${e.institute}" oninput="edus[${i}].institute=this.value;renderCV()"></div></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_yr')}</label><input value="${e.year}" oninput="edus[${i}].year=this.value;renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_res')}</label><input value="${e.result}" oninput="edus[${i}].result=this.value;renderCV()"></div></div>
+      <div class="field-row full"><div class="field-group"><label>${t('lbl_brd')}</label><input value="${e.board}" oninput="edus[${i}].board=this.value;renderCV()"></div></div>
+    </div>`).join('');
+}
+function addExp(){exps.push({position:'',company:'',from:'',to:'',desc:''}); renderExpList(); renderCV();}
+function removeExp(i){exps.splice(i,1); renderExpList(); renderCV();}
+function renderExpList(){
+  document.getElementById('exp-list').innerHTML=exps.map((e,i)=>`
+    <div class="repeat-item">
+      <div class="repeat-item-header"><span class="repeat-item-title">${t('lbl_exp')} ${i+1}</span><button class="btn-remove" onclick="removeExp(${i})">✕ ${t('remove')}</button></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_pos')}</label><input value="${e.position}" oninput="exps[${i}].position=this.value;renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_comp')}</label><input value="${e.company}" oninput="exps[${i}].company=this.value;renderCV()"></div></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_from')}</label><input value="${e.from}" oninput="exps[${i}].from=this.value;renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_to')}</label><input value="${e.to}" oninput="exps[${i}].to=this.value;renderCV()"></div></div>
+      <div class="field-row full"><div class="field-group"><label>${t('lbl_desc')}</label><textarea rows="2" oninput="exps[${i}].desc=this.value;renderCV()">${e.desc}</textarea></div></div>
+    </div>`).join('');
+}
+function addSkill(){skills.push({name:'',level:70}); renderSkillList(); renderCV();}
+function removeSkill(i){skills.splice(i,1); renderSkillList(); renderCV();}
+function renderSkillList(){
+  document.getElementById('skill-list').innerHTML=skills.map((s,i)=>`
+    <div class="repeat-item">
+      <div class="repeat-item-header"><span class="repeat-item-title">${s.name||t('lbl_sk')+' '+(i+1)}</span><button class="btn-remove" onclick="removeSkill(${i})">✕</button></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_sn')}</label><input value="${s.name}" oninput="skills[${i}].name=this.value;renderSkillList();renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_sl')}: ${s.level}%</label><input type="range" min="10" max="100" value="${s.level}" oninput="skills[${i}].level=+this.value;renderSkillList();renderCV()"></div></div>
+    </div>`).join('');
+}
+function addCourse(){courses.push({name:'',org:'',year:''}); renderCourseList(); renderCV();}
+function removeCourse(i){courses.splice(i,1); renderCourseList(); renderCV();}
+function renderCourseList(){
+  document.getElementById('course-list').innerHTML=courses.map((c,i)=>`
+    <div class="repeat-item">
+      <div class="repeat-item-header"><span class="repeat-item-title">${t('lbl_cr')} ${i+1}</span><button class="btn-remove" onclick="removeCourse(${i})">✕</button></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_cn')}</label><input value="${c.name}" oninput="courses[${i}].name=this.value;renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_co')}</label><input value="${c.org}" oninput="courses[${i}].org=this.value;renderCV()"></div></div>
+      <div class="field-row full"><div class="field-group"><label>${t('lbl_cy')}</label><input value="${c.year}" oninput="courses[${i}].year=this.value;renderCV()"></div></div>
+    </div>`).join('');
+}
+function addRef(){refs.push({name:'',title:'',phone:'',email:''}); renderRefList(); renderCV();}
+function removeRef(i){refs.splice(i,1); renderRefList(); renderCV();}
+function renderRefList(){
+  document.getElementById('ref-list').innerHTML=refs.map((r,i)=>`
+    <div class="repeat-item">
+      <div class="repeat-item-header"><span class="repeat-item-title">${t('lbl_rf')} ${i+1}</span><button class="btn-remove" onclick="removeRef(${i})">✕</button></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_rn')}</label><input value="${r.name}" oninput="refs[${i}].name=this.value;renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_rt')}</label><input value="${r.title}" oninput="refs[${i}].title=this.value;renderCV()"></div></div>
+      <div class="field-row"><div class="field-group"><label>${t('lbl_rp')}</label><input value="${r.phone}" oninput="refs[${i}].phone=this.value;renderCV()"></div>
+      <div class="field-group"><label>${t('lbl_re')}</label><input type="email" value="${r.email}" oninput="refs[${i}].email=this.value;renderCV()"></div></div>
+    </div>`).join('');
+}
+
+// ========== MODAL / TOAST / LOADING ==========
 function openModal(id){document.getElementById(id).classList.remove('hidden');}
 function closeModal(id){document.getElementById(id).classList.add('hidden');}
 function showToast(msg,type='info'){
-  const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg;
-  document.body.appendChild(t); setTimeout(()=>t.remove(),3600);
+  const t2=document.createElement('div'); t2.className=`toast ${type}`; t2.textContent=msg;
+  document.body.appendChild(t2); setTimeout(()=>t2.remove(),3200);
 }
 function showLoading(v){document.getElementById('loading').classList.toggle('hidden',!v);}
+
+// ========== INIT ==========
+function initApp(){
+  Object.keys(d).forEach(id=>{const el=document.getElementById(id); if(el) el.value=d[id];});
+  renderEduList(); renderExpList(); renderSkillList(); renderCourseList(); renderRefList();
+  renderCV();
+}
 </script>
 </body>
 </html>
